@@ -3,6 +3,7 @@ package com.github.sibmaks.ad_vita_bot.handler;
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
 import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.exception.SendRsException;
 import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import com.github.sibmaks.ad_vita_bot.service.TelegramBotStorage;
@@ -45,11 +46,11 @@ public class InputAmountStateMutator implements StateHandler {
         var command = buildEnterMessage(chatId);
 
         try {
-            log.debug("[{}] Send input amount message", chatId);
+            log.info("[{}] Send input amount message", chatId);
             sender.execute(command);
         } catch (TelegramApiException e) {
             log.error("Message sending error", e);
-            // TODO: retry on error?
+            throw new SendRsException("Message sending error",e);
         }
 
         return Transition.stop();
@@ -76,7 +77,7 @@ public class InputAmountStateMutator implements StateHandler {
                 sender.execute(command);
             } catch (TelegramApiException e) {
                 log.error("Message sending error", e);
-                // TODO: retry on error?
+                throw new SendRsException("Message sending error",e);
             }
 
             return Transition.stop();

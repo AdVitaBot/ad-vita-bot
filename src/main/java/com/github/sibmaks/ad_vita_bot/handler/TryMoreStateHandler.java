@@ -3,6 +3,7 @@ package com.github.sibmaks.ad_vita_bot.handler;
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
 import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.exception.SendRsException;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -43,7 +43,7 @@ public class TryMoreStateHandler implements StateHandler {
             sender.execute(command);
         } catch (TelegramApiException e) {
             log.error("Message sending error", e);
-            // TODO: retry on error?
+            throw new SendRsException("Message sending error",e);
         }
 
         return Transition.stop();
@@ -55,15 +55,7 @@ public class TryMoreStateHandler implements StateHandler {
             return Transition.stop();
         }
         var callbackQuery = update.getCallbackQuery();
-        var message = callbackQuery.getMessage();
-        var command = buildHideKeyboard(chatId, message.getMessageId());
-        try {
-            log.debug("[{}] Hide keyboard", chatId);
-            sender.execute(command);
-        } catch (TelegramApiException e) {
-            log.error("Message sending error", e);
-            // TODO: retry on error?
-        }
+        hideKeyboard(chatId, sender, callbackQuery, log);
         return Transition.go(UserFlowState.CHOOSE_THEME);
     }
 
@@ -92,12 +84,4 @@ public class TryMoreStateHandler implements StateHandler {
         return button;
     }
 
-    @NotNull
-    private EditMessageReplyMarkup buildHideKeyboard(long chatId, Integer messageId) {
-        return EditMessageReplyMarkup.builder()
-                .chatId(chatId)
-                .messageId(messageId)
-                .replyMarkup(null)
-                .build();
-    }
 }

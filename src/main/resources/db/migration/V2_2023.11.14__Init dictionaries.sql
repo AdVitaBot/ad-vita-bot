@@ -3,7 +3,8 @@
  */
 INSERT INTO "bot_parameters" ("code", "name", "type", "value")
 VALUES ('invoice_provider_token', 'Токен платёжной системы', 'STRING', 'Заполнить'),
-       ('deactivation_date', 'Дата окончания акции', 'DATE', '3000-12-31');
+       ('deactivation_date', 'Дата окончания акции', 'DATE', '3000-12-31')
+ON CONFLICT DO NOTHING;
 
 /**
   Fill default localizations
@@ -30,11 +31,14 @@ VALUES ('welcome_text', 'Благодарим вас за интерес к ак
 
        ('invoice_title', 'Пожертвование'),
        ('invoice_description', 'Пожертвование в фонд AdVita'),
-       ('invoice_price_label', 'Пожертвование');
+       ('invoice_price_label', 'Пожертвование'),
+       ('goodbye_message', 'Наша акция завершена, спасибо за участие!')
+ON CONFLICT DO NOTHING;
 
 /**
   Fill themes
  */
 INSERT INTO "theme" ("id", "min_donation_amount", "max_donation_amount", "description")
 VALUES (1, 100.00, 900000.00, 'Печеньки с предсказаниями'),
-       (2, 100.00, 900000.00, 'Твое внутреннее я');
+       (2, 100.00, 900000.00, 'Твое внутреннее я')
+ON CONFLICT DO NOTHING;

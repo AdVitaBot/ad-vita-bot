@@ -1,10 +1,14 @@
 package com.github.sibmaks.ad_vita_bot.handler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.sibmaks.ad_vita_bot.constant.ServiceError;
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
 import com.github.sibmaks.ad_vita_bot.dto.InvoicePayload;
 import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.exception.SendRsException;
+import com.github.sibmaks.ad_vita_bot.exception.ServiceException;
 import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import com.github.sibmaks.ad_vita_bot.service.TelegramBotStorage;
@@ -42,7 +46,6 @@ public class InvoiceStateMutator implements StateHandler {
     private final LocalisationService localisationService;
 
 
-    @SneakyThrows
     public InvoiceStateMutator(@Value("classpath:apple.png") Resource demoResource,
                                ChatStorage chatStorage,
                                ObjectMapper objectMapper,
@@ -69,7 +72,7 @@ public class InvoiceStateMutator implements StateHandler {
             sender.execute(command);
         } catch (TelegramApiException e) {
             log.error("Message sending error", e);
-            // TODO: retry on error?
+            throw new SendRsException("Message sending error", e);
         }
 
         return Transition.stop();
@@ -88,7 +91,7 @@ public class InvoiceStateMutator implements StateHandler {
                 sender.execute(query);
             } catch (TelegramApiException e) {
                 log.error("Message sending error", e);
-                // TODO: retry on error?
+                throw new SendRsException("Message sending error", e);
             }
         } else if (update.hasMessage()) {
             var message = update.getMessage();
@@ -103,20 +106,20 @@ public class InvoiceStateMutator implements StateHandler {
 
                 var themeMessage = buildThemeMessage(chatId);
                 try {
-                    log.debug("[{}] Send theme message", chatId);
+                    log.info("[{}] Send theme message", chatId);
                     sender.execute(themeMessage);
                 } catch (TelegramApiException e) {
                     log.error("Message sending error", e);
-                    // TODO: retry on error?
+                    throw new SendRsException("Message sending error", e);
                 }
 
                 var imageMessage = buildImageMessage(chatId);
                 try {
-                    log.debug("[{}] Send image", chatId);
+                    log.info("[{}] Send image", chatId);
                     sender.execute(imageMessage);
                 } catch (TelegramApiException e) {
                     log.error("Message sending error", e);
-                    // TODO: retry on error?
+                    throw new SendRsException("Message sending error", e);
                 }
 
                 return Transition.go(UserFlowState.TRY_MORE);
@@ -126,7 +129,6 @@ public class InvoiceStateMutator implements StateHandler {
         return Transition.stop();
     }
 
-    @SneakyThrows
     @NotNull
     private SendInvoice buildEnterMessage(Long chatId) {
         var invoicePayload = InvoicePayload.builder()
@@ -137,12 +139,18 @@ public class InvoiceStateMutator implements StateHandler {
         var invoiceProviderToken = telegramBotStorage.getInvoiceProviderToken();
         var kopecksAmount = amount.multiply(HUNDRED).intValue();
 
+        String payload;
+        try {
+            payload = objectMapper.writeValueAsString(invoicePayload);
+        } catch (JsonProcessingException e) {
+            throw new ServiceException("Unexpected invoice payload creation exception", e, ServiceError.UNEXPECTED_ERROR);
+        }
         return SendInvoice.builder()
                 .chatId(chatId)
                 .title(localisationService.getLocalization("invoice_title"))
                 .description(localisationService.getLocalization("invoice_description"))
                 .startParameter("ad_vita_bot")
-                .payload(objectMapper.writeValueAsString(invoicePayload))
+                .payload(payload)
                 .price(new LabeledPrice(localisationService.getLocalization("invoice_price_label"), kopecksAmount))
                 .currency("RUB")
                 .needName(Boolean.TRUE)
@@ -152,7 +160,6 @@ public class InvoiceStateMutator implements StateHandler {
                 .build();
     }
 
-    @SneakyThrows
     private SendMessage buildThemeMessage(Long chatId) {
         var theme = chatStorage.getTheme(chatId);
 

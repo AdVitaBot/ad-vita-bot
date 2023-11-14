@@ -3,6 +3,7 @@ package com.github.sibmaks.ad_vita_bot.handler;
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
 import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.exception.SendRsException;
 import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageReplyMarkup;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
@@ -28,6 +28,7 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class ChooseAmountStateMutator implements StateHandler {
+    private static final String OTHER_AMOUNT = "other";
 
     private final ChatStorage chatStorage;
     private final LocalisationService localisationService;
@@ -46,7 +47,7 @@ public class ChooseAmountStateMutator implements StateHandler {
             sender.execute(command);
         } catch (TelegramApiException e) {
             log.error("Message sending error", e);
-            // TODO: retry on error?
+            throw new SendRsException("Message sending error",e);
         }
 
         return Transition.stop();
@@ -59,16 +60,10 @@ public class ChooseAmountStateMutator implements StateHandler {
         }
         var callbackQuery = update.getCallbackQuery();
         var data = callbackQuery.getData();
-        var message = callbackQuery.getMessage();
-        var command = buildHideKeyboard(chatId, message.getMessageId());
-        try {
-            log.debug("[{}] Hide keyboard", chatId);
-            sender.execute(command);
-        } catch (TelegramApiException e) {
-            log.error("Message sending error", e);
-            // TODO: retry on error?
-        }
-        if ("other".equals(data)) {
+
+        hideKeyboard(chatId, sender, callbackQuery, log);
+
+        if (OTHER_AMOUNT.equals(data)) {
             return Transition.go(UserFlowState.INPUT_AMOUNT);
         } else {
             chatStorage.setAmount(chatId, data);
@@ -92,7 +87,7 @@ public class ChooseAmountStateMutator implements StateHandler {
                         )
                 )
                 .keyboardRow(List.of(
-                                inlineKeyboardButton(localisationService.getLocalization("other_amount_text"), "other")
+                                inlineKeyboardButton(localisationService.getLocalization("other_amount_text"), OTHER_AMOUNT)
                         )
                 )
                 .build();
@@ -109,15 +104,6 @@ public class ChooseAmountStateMutator implements StateHandler {
         button.setText(text);
         button.setCallbackData(value);
         return button;
-    }
-
-    @NotNull
-    private EditMessageReplyMarkup buildHideKeyboard(long chatId, Integer messageId) {
-        return EditMessageReplyMarkup.builder()
-                .chatId(chatId)
-                .messageId(messageId)
-                .replyMarkup(null)
-                .build();
     }
 
 }
