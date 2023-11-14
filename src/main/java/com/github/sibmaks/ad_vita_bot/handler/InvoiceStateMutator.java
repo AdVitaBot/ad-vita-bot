@@ -68,7 +68,7 @@ public class InvoiceStateMutator implements StateHandler {
         var command = buildEnterMessage(chatId);
 
         try {
-            log.debug("[{}] Send invoice", chatId);
+            log.info("[{}] Send invoice", chatId);
             sender.execute(command);
         } catch (TelegramApiException e) {
             log.error("Message sending error", e);
@@ -87,7 +87,7 @@ public class InvoiceStateMutator implements StateHandler {
             query.setOk(true);
             query.setPreCheckoutQueryId(preCheckoutQuery.getId());
             try {
-                log.debug("[{}] Send ok answer on pre checkout query", chatId);
+                log.info("[{}] Send ok answer on pre checkout query", chatId);
                 sender.execute(query);
             } catch (TelegramApiException e) {
                 log.error("Message sending error", e);
