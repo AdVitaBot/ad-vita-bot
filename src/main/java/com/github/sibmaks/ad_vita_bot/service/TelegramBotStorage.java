@@ -25,7 +25,7 @@ public class TelegramBotStorage {
      * @return themes list
      */
     public List<String> getThemes() {
-        return List.of("Тема 1", "Тема 2");
+        return List.of("Тема \"Котики\"", "Тема \"Слоники\"");
     }
 
     /**

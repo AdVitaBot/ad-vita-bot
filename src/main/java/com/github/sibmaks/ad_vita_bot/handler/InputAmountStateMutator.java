@@ -105,7 +105,7 @@ public class InputAmountStateMutator implements StateHandler {
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("Введите сумму пожертвования в рублях в формате 0.00")
+                .text("Введите сумму пожертвования в рублях в формате 0.00. Минимальная сумма пожертвования 100₽")
                 .replyMarkup(replyKeyboardRemove)
                 .build();
     }
@@ -114,7 +114,7 @@ public class InputAmountStateMutator implements StateHandler {
     private SendMessage buildErrorMessage(Long chatId) {
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("Укажите корректную сумму")
+                .text("Укажите корректную сумму пожертвования")
                 .build();
     }
 }
