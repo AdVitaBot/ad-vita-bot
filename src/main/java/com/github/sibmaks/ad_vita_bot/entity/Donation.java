@@ -1,5 +1,6 @@
 package com.github.sibmaks.ad_vita_bot.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -41,7 +42,13 @@ public class Donation {
 
     @ManyToOne
     @JoinColumn(name = "chat_id", nullable = false)
+    @JsonBackReference
     private Participant participant;
+
+    @ManyToOne
+    @JoinColumn(name = "drawing_id")
+    @JsonBackReference
+    private Drawing drawing;
 
     @Override
     public boolean equals(Object o) {

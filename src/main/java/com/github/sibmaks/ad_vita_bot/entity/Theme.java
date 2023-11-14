@@ -1,9 +1,12 @@
 package com.github.sibmaks.ad_vita_bot.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,7 +36,8 @@ public class Theme {
 
     private String description;
 
-    @OneToMany(mappedBy="theme")
+    @OneToMany(mappedBy="theme", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Drawing> drawings;
 
     @Override

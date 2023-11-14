@@ -1,12 +1,13 @@
 package com.github.sibmaks.ad_vita_bot.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,8 +30,12 @@ public class Participant {
     @Column(name = "chat_id")
     private Long chatId;
 
-    @OneToMany(mappedBy="participant")
+    @OneToMany(mappedBy="participant", fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Donation> donations;
+
+    @Enumerated(EnumType.STRING)
+    private State state;
 
     @Override
     public boolean equals(Object o) {
@@ -39,18 +44,22 @@ public class Participant {
 
         Participant that = (Participant) o;
 
-        return Objects.equals(chatId, that.chatId);
+        if (!Objects.equals(chatId, that.chatId)) return false;
+        return state == that.state;
     }
 
     @Override
     public int hashCode() {
-        return chatId != null ? chatId.hashCode() : 0;
+        int result = chatId != null ? chatId.hashCode() : 0;
+        result = 31 * result + (state != null ? state.hashCode() : 0);
+        return result;
     }
 
     @Override
     public String toString() {
         return "Participant{" +
                 "chatId=" + chatId +
+                ", state=" + state +
                 '}';
     }
 }

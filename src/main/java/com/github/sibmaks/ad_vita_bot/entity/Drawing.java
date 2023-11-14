@@ -1,16 +1,21 @@
 package com.github.sibmaks.ad_vita_bot.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.sql.Blob;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -33,7 +38,12 @@ public class Drawing {
 
     @ManyToOne
     @JoinColumn(name = "theme_id", nullable = false)
+    @JsonBackReference
     private Theme theme;
+
+    @OneToMany(mappedBy="drawing", fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private List<Donation> donations;
 
     @Override
     public boolean equals(Object o) {
