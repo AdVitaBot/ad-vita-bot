@@ -1,4 +1,4 @@
-package com.github.sibmaks.ad_vita_bot.entity;
+package com.github.sibmaks.ad_vita_bot.dto;
 
 /**
  * @author sibmaks
@@ -8,6 +8,7 @@ public enum UserFlowState {
 
     WELCOME,
     CHOOSE_THEME,
+    CHOOSE_AMOUNT,
     INPUT_AMOUNT,
     INVOICE,
     TRY_MORE

@@ -1,4 +1,4 @@
-package com.github.sibmaks.ad_vita_bot.entity;
+package com.github.sibmaks.ad_vita_bot.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,11 +11,11 @@ import java.io.Serializable;
  * @author sibmaks
  * @since 0.0.1
  */
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Localization implements Serializable {
-    private String code;
-    private String message;
+public class Theme implements Serializable {
+    private int id;
+    private String text;
 }

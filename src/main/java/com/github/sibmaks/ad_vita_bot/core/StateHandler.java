@@ -1,6 +1,6 @@
 package com.github.sibmaks.ad_vita_bot.core;
 
-import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.objects.Update;
 

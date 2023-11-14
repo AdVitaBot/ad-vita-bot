@@ -2,7 +2,7 @@ package com.github.sibmaks.ad_vita_bot.handler;
 
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
-import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -11,13 +11,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
-import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-
-import java.io.IOException;
 
 /**
  * @author sibmaks
@@ -60,16 +57,14 @@ public class WelcomeStateMutator implements StateHandler {
     }
 
     @NotNull
-    private SendPhoto buildSendPhoto(Long chatId) throws IOException {
+    private SendMessage buildSendPhoto(Long chatId) {
         var replyKeyboardRemove = ReplyKeyboardRemove.builder()
                 .removeKeyboard(Boolean.TRUE)
                 .build();
 
-        return SendPhoto.builder()
+        return SendMessage.builder()
                 .chatId(chatId)
-                .caption(localisationService.getLocalization("welcome_text"))
-                // TODO: took from another place
-                .photo(new InputFile(logoResource.getInputStream(), "AdVita!"))
+                .text(localisationService.getLocalization("welcome_text"))
                 .replyMarkup(replyKeyboardRemove)
                 .build();
     }

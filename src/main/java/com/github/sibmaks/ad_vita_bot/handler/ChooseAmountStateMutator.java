@@ -3,6 +3,7 @@ package com.github.sibmaks.ad_vita_bot.handler;
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
 import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,12 +27,14 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class TryMoreStateHandler implements StateHandler {
+public class ChooseAmountStateMutator implements StateHandler {
+
+    private final ChatStorage chatStorage;
     private final LocalisationService localisationService;
 
     @Override
     public UserFlowState getHandledState() {
-        return UserFlowState.TRY_MORE;
+        return UserFlowState.CHOOSE_AMOUNT;
     }
 
     @Override
@@ -39,7 +42,7 @@ public class TryMoreStateHandler implements StateHandler {
         var command = buildEnterMessage(chatId);
 
         try {
-            log.debug("[{}] Send try more message", chatId);
+            log.debug("[{}] Send chose amount message", chatId);
             sender.execute(command);
         } catch (TelegramApiException e) {
             log.error("Message sending error", e);
@@ -55,6 +58,7 @@ public class TryMoreStateHandler implements StateHandler {
             return Transition.stop();
         }
         var callbackQuery = update.getCallbackQuery();
+        var data = callbackQuery.getData();
         var message = callbackQuery.getMessage();
         var command = buildHideKeyboard(chatId, message.getMessageId());
         try {
@@ -64,24 +68,39 @@ public class TryMoreStateHandler implements StateHandler {
             log.error("Message sending error", e);
             // TODO: retry on error?
         }
-        return Transition.go(UserFlowState.CHOOSE_THEME);
+        if ("other".equals(data)) {
+            return Transition.go(UserFlowState.INPUT_AMOUNT);
+        } else {
+            chatStorage.setAmount(chatId, data);
+            return Transition.go(UserFlowState.INVOICE);
+        }
     }
 
     @NotNull
     private SendMessage buildEnterMessage(Long chatId) {
+        var keyboard = InlineKeyboardMarkup.builder()
+                .keyboardRow(List.of(
+                                inlineKeyboardButton("100 ₽", "100"),
+                                inlineKeyboardButton("200 ₽", "200"),
+                                inlineKeyboardButton("300 ₽", "300")
+                        )
+                )
+                .keyboardRow(List.of(
+                                inlineKeyboardButton("500 ₽", "500"),
+                                inlineKeyboardButton("1 000 ₽", "1000"),
+                                inlineKeyboardButton("2 000 ₽", "2000")
+                        )
+                )
+                .keyboardRow(List.of(
+                                inlineKeyboardButton(localisationService.getLocalization("other_amount_text"), "other")
+                        )
+                )
+                .build();
+
         return SendMessage.builder()
                 .chatId(chatId)
-                .text(localisationService.getLocalization("try_more_text"))
-                .replyMarkup(replyKeyboard())
-                .build();
-    }
-
-    private InlineKeyboardMarkup replyKeyboard() {
-        var tryMoreButton = localisationService.getLocalization("try_more_button_text");
-        return InlineKeyboardMarkup.builder()
-                .keyboardRow(List.of(
-                        inlineKeyboardButton(tryMoreButton, "repeat")
-                ))
+                .text(localisationService.getLocalization("choose_amount_text"))
+                .replyMarkup(keyboard)
                 .build();
     }
 
@@ -100,4 +119,5 @@ public class TryMoreStateHandler implements StateHandler {
                 .replyMarkup(null)
                 .build();
     }
+
 }

@@ -5,8 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sibmaks.ad_vita_bot.conf.TelegramBotProperties;
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
-import com.github.sibmaks.ad_vita_bot.entity.InvoicePayload;
-import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.dto.InvoicePayload;
+import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
 import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -136,6 +136,10 @@ public class TelegramStateBot extends TelegramLongPollingBot {
                 log.error("Invalid invoice payload", e);
                 throw new RuntimeException(e);
             }
+        } else if(update.hasCallbackQuery()) {
+            var callbackQuery = update.getCallbackQuery();
+            var message = callbackQuery.getMessage();
+            return message.getChatId();
         } else {
             log.warn("Unsupported update happened: {}", update.getUpdateId());
         }

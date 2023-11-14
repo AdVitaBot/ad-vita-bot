@@ -2,8 +2,9 @@ package com.github.sibmaks.ad_vita_bot.handler;
 
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
-import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
 import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
+import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import com.github.sibmaks.ad_vita_bot.service.TelegramBotStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ public class InputAmountStateMutator implements StateHandler {
 
     private final ChatStorage chatStorage;
     private final TelegramBotStorage telegramBotStorage;
+    private final LocalisationService localisationService;
 
     @Override
     public UserFlowState getHandledState() {
@@ -107,7 +109,7 @@ public class InputAmountStateMutator implements StateHandler {
 
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("Введите сумму пожертвования в рублях в формате 0.00. Минимальная сумма пожертвования 100₽")
+                .text(localisationService.getLocalization("input_amount_text"))
                 .replyMarkup(replyKeyboardRemove)
                 .build();
     }
@@ -116,7 +118,7 @@ public class InputAmountStateMutator implements StateHandler {
     private SendMessage buildErrorMessage(Long chatId) {
         return SendMessage.builder()
                 .chatId(chatId)
-                .text("Укажите корректную сумму пожертвования")
+                .text(localisationService.getLocalization("input_amount_error_text"))
                 .build();
     }
 }

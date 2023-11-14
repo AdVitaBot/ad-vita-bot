@@ -1,6 +1,6 @@
 package com.github.sibmaks.ad_vita_bot.conf;
 
-import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

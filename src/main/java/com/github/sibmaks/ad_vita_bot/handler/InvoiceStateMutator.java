@@ -3,9 +3,10 @@ package com.github.sibmaks.ad_vita_bot.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
-import com.github.sibmaks.ad_vita_bot.entity.InvoicePayload;
-import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.dto.InvoicePayload;
+import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
 import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
+import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import com.github.sibmaks.ad_vita_bot.service.TelegramBotStorage;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
 import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice;
+import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -37,17 +39,20 @@ public class InvoiceStateMutator implements StateHandler {
     private final ChatStorage chatStorage;
     private final ObjectMapper objectMapper;
     private final TelegramBotStorage telegramBotStorage;
+    private final LocalisationService localisationService;
 
 
     @SneakyThrows
     public InvoiceStateMutator(@Value("classpath:apple.png") Resource demoResource,
                                ChatStorage chatStorage,
                                ObjectMapper objectMapper,
-                               TelegramBotStorage telegramBotStorage) {
+                               TelegramBotStorage telegramBotStorage,
+                               LocalisationService localisationService) {
         this.demoResource = demoResource;
         this.chatStorage = chatStorage;
         this.objectMapper = objectMapper;
         this.telegramBotStorage = telegramBotStorage;
+        this.localisationService = localisationService;
     }
 
     @Override
@@ -90,10 +95,28 @@ public class InvoiceStateMutator implements StateHandler {
             if (message.hasSuccessfulPayment()) {
                 var successfulPayment = message.getSuccessfulPayment();
                 // TODO: random image pick
-                var sendPhoto = buildThankfullyMessage(chatId);
+                var thankfullyMessage = buildThankfullyMessage(chatId);
                 try {
-                    log.debug("[{}] Send photo for successful payment", chatId);
-                    sender.execute(sendPhoto);
+                    log.debug("[{}] Send thankfully message", chatId);
+                    sender.execute(thankfullyMessage);
+                } catch (TelegramApiException e) {
+                    log.error("Message sending error", e);
+                    // TODO: retry on error?
+                }
+
+                var themeMessage = buildThemeMessage(chatId);
+                try {
+                    log.debug("[{}] Send theme message", chatId);
+                    sender.execute(themeMessage);
+                } catch (TelegramApiException e) {
+                    log.error("Message sending error", e);
+                    // TODO: retry on error?
+                }
+
+                var imageMessage = buildImageMessage(chatId);
+                try {
+                    log.debug("[{}] Send image", chatId);
+                    sender.execute(imageMessage);
                 } catch (TelegramApiException e) {
                     log.error("Message sending error", e);
                     // TODO: retry on error?
@@ -112,17 +135,17 @@ public class InvoiceStateMutator implements StateHandler {
                 .chatId(chatId)
                 .build();
 
-        var theme = chatStorage.getTheme(chatId);
         var amount = new BigDecimal(chatStorage.getAmount(chatId));
         var invoiceProviderToken = telegramBotStorage.getInvoiceProviderToken();
+        var kopecksAmount = amount.multiply(HUNDRED).intValue();
 
         return SendInvoice.builder()
                 .chatId(chatId)
-                .title("Пожертвование")
-                .description("Вы выбрали тему: " + theme)
+                .title(localisationService.getLocalization("invoice_title"))
+                .description(localisationService.getLocalization("invoice_description"))
                 .startParameter("")
                 .payload(objectMapper.writeValueAsString(invoicePayload))
-                .price(new LabeledPrice("Пожертвование", amount.multiply(HUNDRED).intValue()))
+                .price(new LabeledPrice(localisationService.getLocalization("invoice_price_label"), kopecksAmount))
                 .currency("RUB")
                 .needEmail(Boolean.TRUE)
                 .sendEmailToProvider(Boolean.TRUE)
@@ -131,10 +154,27 @@ public class InvoiceStateMutator implements StateHandler {
     }
 
     @SneakyThrows
-    private SendPhoto buildThankfullyMessage(Long chatId) {
+    private SendMessage buildThankfullyMessage(Long chatId) {
+        return SendMessage.builder()
+                .chatId(chatId)
+                .text(localisationService.getLocalization("thankfully_message_text"))
+                .build();
+    }
+
+    @SneakyThrows
+    private SendMessage buildThemeMessage(Long chatId) {
+        var theme = chatStorage.getTheme(chatId);
+
+        return SendMessage.builder()
+                .chatId(chatId)
+                .text(localisationService.getLocalization("theme_%d_message_text".formatted(theme.getId())))
+                .build();
+    }
+
+    @SneakyThrows
+    private SendPhoto buildImageMessage(Long chatId) {
         return SendPhoto.builder()
                 .chatId(chatId)
-                .caption("Спасибо за пожертвование")
                 .photo(new InputFile(demoResource.getInputStream(), "Картинка"))
                 .build();
     }

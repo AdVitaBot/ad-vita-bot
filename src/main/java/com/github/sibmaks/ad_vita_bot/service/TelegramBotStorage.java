@@ -1,5 +1,8 @@
 package com.github.sibmaks.ad_vita_bot.service;
 
+import com.github.sibmaks.ad_vita_bot.dto.Theme;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -9,7 +12,11 @@ import java.util.List;
  * @since 0.0.1
  */
 @Service
+@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TelegramBotStorage {
+    private final LocalisationService localisationService;
+
+
     /**
      * Get invoice provider token
      *
@@ -24,8 +31,11 @@ public class TelegramBotStorage {
      *
      * @return themes list
      */
-    public List<String> getThemes() {
-        return List.of("Тема \"Котики\"", "Тема \"Слоники\"");
+    public List<Theme> getThemes() {
+        return List.of(
+                new Theme(1, localisationService.getLocalization("theme_1_name")),
+                new Theme(2, localisationService.getLocalization("theme_2_name"))
+        );
     }
 
     /**
@@ -45,5 +55,12 @@ public class TelegramBotStorage {
      */
     public int getMaxAmount() {
         return 900_000_00;
+    }
+
+    public Theme findThemeById(int themeId) {
+        return getThemes().stream()
+                .filter(it -> it.getId() == themeId)
+                .findFirst()
+                .orElse(null);
     }
 }
