@@ -16,7 +16,7 @@ public class TelegramBotStorage {
      * @return invoice provider token
      */
     public String getInvoiceProviderToken() {
-        return "1744374395:TEST:51ada44ec2bba35a2d15";
+        return "381764678:TEST:71235";
     }
 
     /**

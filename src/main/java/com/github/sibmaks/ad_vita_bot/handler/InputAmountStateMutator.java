@@ -43,6 +43,7 @@ public class InputAmountStateMutator implements StateHandler {
         var command = buildEnterMessage(chatId);
 
         try {
+            log.debug("[{}] Send input amount message", chatId);
             sender.execute(command);
         } catch (TelegramApiException e) {
             log.error("Message sending error", e);
@@ -69,6 +70,7 @@ public class InputAmountStateMutator implements StateHandler {
             var command = buildErrorMessage(chatId);
 
             try {
+                log.warn("[{}] Send incorrect amount message", chatId);
                 sender.execute(command);
             } catch (TelegramApiException e) {
                 log.error("Message sending error", e);

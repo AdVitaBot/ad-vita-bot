@@ -10,5 +10,13 @@
   {
     "code": "pick_exists_theme_text",
     "message": "Не знаю такую тему,\nВыберите одну из существующих тем"
+  },
+  {
+    "code": "try_more_text",
+    "message": "Не хотели бы вы попробовать ещё?"
+  },
+  {
+    "code": "try_more_button_text",
+    "message": "Повторить"
   }
 ]

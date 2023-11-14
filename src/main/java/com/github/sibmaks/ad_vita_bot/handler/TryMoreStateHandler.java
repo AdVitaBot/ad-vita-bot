@@ -3,9 +3,7 @@ package com.github.sibmaks.ad_vita_bot.handler;
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
 import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
-import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
-import com.github.sibmaks.ad_vita_bot.service.TelegramBotStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -19,8 +17,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.util.stream.Collectors;
-
 /**
  * @author sibmaks
  * @since 0.0.1
@@ -28,15 +24,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class ChooseThemeStateHandler implements StateHandler {
-
-    private final ChatStorage chatStorage;
-    private final TelegramBotStorage telegramBotStorage;
+public class TryMoreStateHandler implements StateHandler {
     private final LocalisationService localisationService;
 
     @Override
     public UserFlowState getHandledState() {
-        return UserFlowState.CHOOSE_THEME;
+        return UserFlowState.TRY_MORE;
     }
 
     @Override
@@ -44,7 +37,7 @@ public class ChooseThemeStateHandler implements StateHandler {
         var command = buildEnterMessage(chatId);
 
         try {
-            log.debug("[{}] Send chose theme message", chatId);
+            log.debug("[{}] Send try more message", chatId);
             sender.execute(command);
         } catch (TelegramApiException e) {
             log.error("Message sending error", e);
@@ -63,58 +56,25 @@ public class ChooseThemeStateHandler implements StateHandler {
         if (!message.hasText()) {
             return Transition.stop();
         }
-        var text = message.getText();
-        var themes = telegramBotStorage.getThemes();
-        if (themes.contains(text)) {
-            chatStorage.setTheme(chatId, text);
-            return Transition.go(UserFlowState.INPUT_AMOUNT);
-        } else {
-            var command = buildErrorMessage(chatId);
-
-            try {
-                log.warn("[{}] Send unknown theme chosen", chatId);
-                sender.execute(command);
-            } catch (TelegramApiException e) {
-                log.error("Message sending error", e);
-                // TODO: retry on error?
-            }
-
-            return Transition.stop();
-        }
+        return Transition.go(UserFlowState.CHOOSE_THEME);
     }
 
     @NotNull
     private SendMessage buildEnterMessage(Long chatId) {
         return SendMessage.builder()
                 .chatId(chatId)
-                .text(localisationService.getLocalization("pick_one_theme_text"))
-                .replyMarkup(replyKeyboard())
+                .text(localisationService.getLocalization("try_more_text"))
+                .replyMarkup(tryMoreKeyboard())
                 .build();
     }
 
-    @NotNull
-    private SendMessage buildErrorMessage(Long chatId) {
-        return SendMessage.builder()
-                .chatId(chatId)
-                .text(localisationService.getLocalization("pick_exists_theme_text"))
-                .replyMarkup(replyKeyboard())
-                .build();
-    }
-
-    private ReplyKeyboard replyKeyboard() {
-        var themes = telegramBotStorage.getThemes();
-        var keyboardRows = themes.stream()
-                .map(this::keyboardRow)
-                .collect(Collectors.toList());
+    private ReplyKeyboard tryMoreKeyboard() {
+        var tryMoreButton = localisationService.getLocalization("try_more_button_text");
+        var keyboardRow = new KeyboardRow(1);
+        keyboardRow.add(tryMoreButton);
         return ReplyKeyboardMarkup.builder()
-                .keyboard(keyboardRows)
+                .keyboardRow(keyboardRow)
                 .resizeKeyboard(Boolean.TRUE)
                 .build();
-    }
-
-    private KeyboardRow keyboardRow(String button) {
-        var keyboardRow = new KeyboardRow(1);
-        keyboardRow.add(button);
-        return keyboardRow;
     }
 }

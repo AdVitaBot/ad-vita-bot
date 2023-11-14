@@ -49,6 +49,7 @@ public class WelcomeStateMutator implements StateHandler {
         var sendPhoto = buildSendPhoto(chatId);
 
         try {
+            log.debug("[{}] Send welcome message", chatId);
             sender.execute(sendPhoto);
         } catch (TelegramApiException e) {
             log.error("Message sending error", e);

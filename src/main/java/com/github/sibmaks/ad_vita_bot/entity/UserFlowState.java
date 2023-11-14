@@ -9,6 +9,7 @@ public enum UserFlowState {
     WELCOME,
     CHOOSE_THEME,
     INPUT_AMOUNT,
-    INVOICE
+    INVOICE,
+    TRY_MORE
 
 }

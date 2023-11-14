@@ -60,6 +60,7 @@ public class InvoiceStateMutator implements StateHandler {
         var command = buildEnterMessage(chatId);
 
         try {
+            log.debug("[{}] Send invoice", chatId);
             sender.execute(command);
         } catch (TelegramApiException e) {
             log.error("Message sending error", e);
@@ -78,6 +79,7 @@ public class InvoiceStateMutator implements StateHandler {
             query.setOk(true);
             query.setPreCheckoutQueryId(preCheckoutQuery.getId());
             try {
+                log.debug("[{}] Send ok answer on pre checkout query", chatId);
                 sender.execute(query);
             } catch (TelegramApiException e) {
                 log.error("Message sending error", e);
@@ -90,12 +92,13 @@ public class InvoiceStateMutator implements StateHandler {
                 // TODO: random image pick
                 var sendPhoto = buildThankfullyMessage(chatId);
                 try {
+                    log.debug("[{}] Send photo for successful payment", chatId);
                     sender.execute(sendPhoto);
                 } catch (TelegramApiException e) {
                     log.error("Message sending error", e);
                     // TODO: retry on error?
                 }
-                return Transition.go(UserFlowState.CHOOSE_THEME);
+                return Transition.go(UserFlowState.TRY_MORE);
             }
         }
 
@@ -119,9 +122,10 @@ public class InvoiceStateMutator implements StateHandler {
                 .description("Вы выбрали тему: " + theme)
                 .startParameter("")
                 .payload(objectMapper.writeValueAsString(invoicePayload))
-                .price(new LabeledPrice("Сумма А", amount.multiply(HUNDRED).intValue()))
+                .price(new LabeledPrice("Пожертвование", amount.multiply(HUNDRED).intValue()))
                 .currency("RUB")
                 .needEmail(Boolean.TRUE)
+                .sendEmailToProvider(Boolean.TRUE)
                 .providerToken(invoiceProviderToken)
                 .build();
     }

@@ -3,10 +3,10 @@ package com.github.sibmaks.ad_vita_bot.bot;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.sibmaks.ad_vita_bot.conf.TelegramBotProperties;
+import com.github.sibmaks.ad_vita_bot.core.StateHandler;
+import com.github.sibmaks.ad_vita_bot.core.Transition;
 import com.github.sibmaks.ad_vita_bot.entity.InvoicePayload;
 import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
-import com.github.sibmaks.ad_vita_bot.core.Transition;
-import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +58,14 @@ public class TelegramStateBot extends TelegramLongPollingBot {
             return;
         }
         var state = chatStorage.getState(chatId);
+        if(state != null) {
+            if(update.hasMessage()) {
+                var message = update.getMessage();
+                if(message.hasText() && "/start".equals(message.getText())) {
+                    state = null;
+                }
+            }
+        }
         Transition transition;
         if(state == null) {
             state = initialFlowState;
