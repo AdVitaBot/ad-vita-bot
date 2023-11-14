@@ -43,6 +43,8 @@ CREATE TABLE "donation"
 (
     "id"             SERIAL PRIMARY KEY,
     "status"         VARCHAR(64)    NOT NULL,
+    "donator_name"   VARCHAR(512)   NOT NULL,
+    "donator_email"  VARCHAR(512)   NOT NULL,
     "participant_id" INTEGER        NOT NULL,
     "drawing_id"     INTEGER        NOT NULL,
     "amount"         NUMERIC(10, 2) NOT NULL,
@@ -51,6 +53,8 @@ CREATE TABLE "donation"
 
 COMMENT ON COLUMN "donation".id IS 'Donation unique id';
 COMMENT ON COLUMN "donation".status IS 'Donation status: CREATED, RECEIVED, CANCELED';
+COMMENT ON COLUMN "donation".donator_name IS 'Donation person name';
+COMMENT ON COLUMN "donation".donator_email IS 'Donation email';
 COMMENT ON COLUMN "donation".participant_id IS 'Foreign key on participant';
 COMMENT ON COLUMN "donation".drawing_id IS 'Foreign key on drawing';
 COMMENT ON COLUMN "donation".amount IS 'Donation amount';

@@ -128,6 +128,12 @@ public class ChooseThemeStateHandler implements StateHandler {
                 .collect(Collectors.toList());
         return InlineKeyboardMarkup.builder()
                 .keyboard(keyboardRows)
+                .keyboardRow(List.of(
+                        urlInlineKeyboardButton(
+                                localisationService.getLocalization("about_fund_text"),
+                                localisationService.getLocalization("fund_url")
+                        )
+                ))
                 .build();
     }
 
@@ -135,6 +141,13 @@ public class ChooseThemeStateHandler implements StateHandler {
         var button = new InlineKeyboardButton();
         button.setText(text);
         button.setCallbackData(value);
+        return button;
+    }
+
+    public InlineKeyboardButton urlInlineKeyboardButton(String text, String url) {
+        var button = new InlineKeyboardButton();
+        button.setText(text);
+        button.setUrl(url);
         return button;
     }
 }

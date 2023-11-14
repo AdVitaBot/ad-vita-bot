@@ -71,7 +71,7 @@ public class TryMoreStateHandler implements StateHandler {
     private SendMessage buildEnterMessage(Long chatId) {
         return SendMessage.builder()
                 .chatId(chatId)
-                .text(localisationService.getLocalization("try_more_text"))
+                .text(localisationService.getLocalization("thankfully_message_text"))
                 .replyMarkup(replyKeyboard())
                 .build();
     }

@@ -94,15 +94,12 @@ public class InvoiceStateMutator implements StateHandler {
             var message = update.getMessage();
             if (message.hasSuccessfulPayment()) {
                 var successfulPayment = message.getSuccessfulPayment();
+                var orderInfo = successfulPayment.getOrderInfo();
+                log.info("[{}] User email: {}", chatId, orderInfo.getEmail());
+                log.info("[{}] User name: {}", chatId, orderInfo.getName());
+                // TODO: save in donation table
+
                 // TODO: random image pick
-                var thankfullyMessage = buildThankfullyMessage(chatId);
-                try {
-                    log.debug("[{}] Send thankfully message", chatId);
-                    sender.execute(thankfullyMessage);
-                } catch (TelegramApiException e) {
-                    log.error("Message sending error", e);
-                    // TODO: retry on error?
-                }
 
                 var themeMessage = buildThemeMessage(chatId);
                 try {
@@ -121,6 +118,7 @@ public class InvoiceStateMutator implements StateHandler {
                     log.error("Message sending error", e);
                     // TODO: retry on error?
                 }
+
                 return Transition.go(UserFlowState.TRY_MORE);
             }
         }
@@ -143,21 +141,14 @@ public class InvoiceStateMutator implements StateHandler {
                 .chatId(chatId)
                 .title(localisationService.getLocalization("invoice_title"))
                 .description(localisationService.getLocalization("invoice_description"))
-                .startParameter("")
+                .startParameter("ad_vita_bot")
                 .payload(objectMapper.writeValueAsString(invoicePayload))
                 .price(new LabeledPrice(localisationService.getLocalization("invoice_price_label"), kopecksAmount))
                 .currency("RUB")
+                .needName(Boolean.TRUE)
                 .needEmail(Boolean.TRUE)
                 .sendEmailToProvider(Boolean.TRUE)
                 .providerToken(invoiceProviderToken)
-                .build();
-    }
-
-    @SneakyThrows
-    private SendMessage buildThankfullyMessage(Long chatId) {
-        return SendMessage.builder()
-                .chatId(chatId)
-                .text(localisationService.getLocalization("thankfully_message_text"))
                 .build();
     }
 
