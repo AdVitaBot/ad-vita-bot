@@ -14,6 +14,12 @@ jobs:
         with:
           java-version: '21'
           distribution: 'oracle'
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
       - name: Make gradlew executable
         run: chmod +x gradlew
       - name: Validate Gradle wrapper
@@ -24,3 +30,4 @@ jobs:
           arguments: publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
