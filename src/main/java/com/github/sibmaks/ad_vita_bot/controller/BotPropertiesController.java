@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 0.0.1
  */
 @RestController
-@RequestMapping("/properties/")
+@RequestMapping("/api/properties/")
 public class BotPropertiesController {
 
     @GetMapping(path = "all", produces = MediaType.APPLICATION_JSON_VALUE)

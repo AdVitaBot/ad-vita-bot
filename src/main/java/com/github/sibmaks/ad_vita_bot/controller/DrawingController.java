@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 0.0.1
  */
 @RestController
-@RequestMapping("/drawing/")
+@RequestMapping("/api/drawing/")
 public class DrawingController {
 
     @GetMapping(path = "get/{id}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)

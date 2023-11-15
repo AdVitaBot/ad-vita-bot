@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
  * @since 0.0.1
  */
 @RestController
-@RequestMapping("/theme/")
+@RequestMapping("/api/theme/")
 public class ThemeController {
 
     @GetMapping(path = "all", produces = MediaType.APPLICATION_JSON_VALUE)
