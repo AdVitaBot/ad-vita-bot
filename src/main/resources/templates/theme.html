@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdVitaBot Admin Panel</title>
+    <link th:href="@{/libs/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/libs/fontawesome/css/all.min.css}" rel="stylesheet">
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+    <script th:src="@{/libs/js/jquery.min.js}"></script>
+    <script th:src="@{/js/core.js}" lang="js"></script>
+</head>
+<body>
+<div class="button-navbar">
+    <button class="btn-sm btn-primary rounded-circle" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+</div>
+<div class="container-fluid vh-100">
+    <div class="" style="margin-top:200px">
+        <div class="rounded d-flex justify-content-center">
+            <form class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
+                <a style="float: left" class="btn btn-outline-secondary" th:href="@{/themes}">&lt;</a>
+                <input type="hidden" id="theme-id" th:value="${theme.id}">
+                <div class="text-center" style="margin-bottom: 16px">
+                    <h3 class="text-primary">Редактирование темы</h3>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="theme-description">Название темы</label>
+                    <input class="form-control" id="theme-description" type="text" required th:value="${theme.description}"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="min-donation-amount">Мин. сумма пожертвования</label>
+                    <input class="form-control" id="min-donation-amount" type="text" required th:value="${theme.minDonationAmount}"/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="max-donation-amount">Макс. сумма пожертвования</label>
+                    <input class="form-control" id="max-donation-amount" type="text" required th:value="${theme.maxDonationAmount}"/>
+                </div>
+                <div class="mb-3">
+                    <button id="save-btn" class="float-end btn btn-primary" type="button" onclick="updateTheme()">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script th:src="@{/js/theme.js}"></script>
+</div>
+</body>
+</html>
