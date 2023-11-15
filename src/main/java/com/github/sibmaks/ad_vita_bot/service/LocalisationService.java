@@ -53,4 +53,12 @@ public class LocalisationService {
     public List<LocalizationEntity> getLocalizations() {
         return localizationRepository.getAllBy();
     }
+
+    public void update(String code, String message) {
+        var localizationEntity = localizationRepository.findById(code)
+                .orElseThrow(() -> new IllegalArgumentException("Localization %s doesn't exists".formatted(code)));
+        localizationEntity.setMessage(message);
+        localizationRepository.save(localizationEntity);
+        cachedLocalizations.put(code, message);
+    }
 }

@@ -27,7 +27,8 @@ public class ThemeServiceImpl implements ThemeService {
 
     @Override
     public Theme getById(Long themeId) {
-        return themeRepository.findById(themeId).get();
+        return themeRepository.findById(themeId)
+                .orElseThrow(() -> new IllegalArgumentException("Theme %s doesn't exists".formatted(themeId)));
     }
 
     @Override
@@ -49,5 +50,14 @@ public class ThemeServiceImpl implements ThemeService {
     public void deleteTheme(Long themeId) {
         Theme theme = getById(themeId);
         themeRepository.delete(theme);
+    }
+
+    @Override
+    public void updateTheme(Long id, String description, BigDecimal minDonationAmount, BigDecimal maxDonationAmount) {
+        var theme = getById(id);
+        theme.setDescription(description);
+        theme.setMinDonationAmount(minDonationAmount);
+        theme.setMaxDonationAmount(maxDonationAmount);
+        themeRepository.save(theme);
     }
 }

@@ -11,8 +11,14 @@ import java.util.List;
  */
 public interface ThemeService {
     List<Theme> getAllThemes();
+
     Theme getById(Long themeId);
+
     Theme createTheme(BigDecimal minDonationAmount, BigDecimal maxDonationAmount, String description);
+
     Theme createTheme(BigDecimal maxDonationAmount, String description);
+
     void deleteTheme(Long themeId);
+
+    void updateTheme(Long id, String description, BigDecimal minDonationAmount, BigDecimal maxDonationAmount);
 }

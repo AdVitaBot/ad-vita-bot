@@ -2,7 +2,6 @@ package com.github.sibmaks.ad_vita_bot.controller;
 
 import com.github.sibmaks.ad_vita_bot.constant.CommonConst;
 import com.github.sibmaks.ad_vita_bot.entity.Drawing;
-import com.github.sibmaks.ad_vita_bot.repository.DrawingRepository;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import com.github.sibmaks.ad_vita_bot.service.TelegramBotStorage;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
 public class UIController {
     private final LocalisationService localisationService;
     private final TelegramBotStorage telegramBotStorage;
-    private final DrawingRepository drawingRepository;
 
     /**
      * Index page, redirect on rooms page if client is authorized.
