@@ -9,9 +9,33 @@
     <link th:href="@{/libs/fontawesome/css/all.min.css}" rel="stylesheet">
     <link th:href="@{/css/app.css}" rel="stylesheet">
     <script th:src="@{/libs/js/jquery.min.js}"></script>
+    <script th:src="@{/libs/js/bootstrap.min.js}"></script>
     <script th:src="@{/js/core.js}" lang="js"></script>
 </head>
 <body>
+<div aria-live="polite" aria-atomic="true" class="position-relative">
+    <div class="toast-container position-fixed top-0 end-0 p-3">
+        <div id="success-save-toast" class="toast align-items-center" role="alert" aria-live="assertive"
+             aria-atomic="true"  data-bs-delay="3000">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Локализация успешно сохранена
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+        <div id="error-save-toast" class="toast align-items-center" role="alert" aria-live="assertive"
+             aria-atomic="true"  data-bs-delay="3000">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Ошибка сохранения локализации
+                </div>
+                <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+</div>
 <div class="button-navbar">
     <button class="btn-sm btn-primary rounded-circle" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
 </div>
@@ -36,10 +60,13 @@
                         <tr th:each="localization : ${localizations}">
                             <td class="align-middle text-center" th:text="${localization.code}"></td>
                             <td>
-                                <textarea class="form-control" th:id="'localization-' + ${localization.code}"  th:text="${localization.message}"></textarea>
+                                <textarea class="form-control" th:id="'localization-' + ${localization.code}"
+                                          th:text="${localization.message}"></textarea>
                             </td>
                             <td class="align-middle text-center">
-                                <button class="btn btn-primary" onclick="updateLocalization(this)" th:data-localization-code="${localization.code}">Сохранить</button>
+                                <button class="btn btn-primary" onclick="updateLocalization(this)"
+                                        th:data-localization-code="${localization.code}">Сохранить
+                                </button>
                             </td>
                         </tr>
                         </tbody>

@@ -1,3 +1,6 @@
+const successSaveToast = bootstrap.Toast.getOrCreateInstance(document.getElementById("success-save-toast"));
+const errorSaveToast = bootstrap.Toast.getOrCreateInstance(document.getElementById("error-save-toast"));
+
 function updateLocalization(updateButton) {
     const localizationCode = updateButton.dataset.localizationCode;
     const localizationMessage = document.getElementById('localization-' + localizationCode).value;
@@ -19,6 +22,7 @@ function updateLocalization(updateButton) {
         .done(function () {
             updateButton.innerHTML = oldVal;
             updateButton.disabled = false;
+            successSaveToast.show();
         })
         .fail(function (jqXHR) {
             if(jqXHR.status === 401) {
@@ -26,6 +30,6 @@ function updateLocalization(updateButton) {
             }
             updateButton.innerHTML = oldVal;
             updateButton.disabled = false;
-            window.alert("Ошибка сохранения");
+            errorSaveToast.show();
         });
 }

@@ -1,3 +1,4 @@
+const loginForm = document.getElementById("login-form");
 const loginInfoField = document.getElementById("login-info-field");
 const passwordInfoField = document.getElementById("password-info-field");
 const authErrorInfo = document.getElementById("auth-error-info");
@@ -6,6 +7,11 @@ const loginField = document.getElementById("login-form-login");
 const passwordField = document.getElementById("login-form-password");
 
 function doLogin() {
+    if (!loginForm.checkValidity()) {
+        loginForm.reportValidity();
+        return;
+    }
+
     const username = loginField.value;
     const password = passwordField.value;
     loginButton.disabled = true;

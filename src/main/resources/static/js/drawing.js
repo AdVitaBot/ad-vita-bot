@@ -1,17 +1,29 @@
+const errorInfoDiv = document.getElementById("error-info");
 const themeId = document.getElementById("theme-id").value;
+const drawingForm = document.getElementById("drawing-form");
 const drawingCaptionInput = document.getElementById("drawing-caption");
 const drawingImageInput = document.getElementById("drawing-image");
 const backButton = document.getElementById("back-btn");
 const saveButton = document.getElementById("save-btn");
 
 async function saveDrawing() {
+    if (!drawingForm.checkValidity()) {
+        drawingForm.reportValidity();
+        return;
+    }
+    const files = drawingImageInput.files;
+    if(!files || files.length === 0) {
+        return;
+    }
+    const file = files[0];
+    const content = await toBase64(file);
+
     saveButton.disabled = true;
     const oldVal = saveButton.innerHTML;
     saveButton.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
 
-    const file = drawingImageInput.files[0];
-    const content = await toBase64(file);
-    console.log(content)
+
+    errorInfoDiv.classList.add('d-none');
 
     $.ajax({
         method: "POST",
@@ -33,6 +45,6 @@ async function saveDrawing() {
             }
             saveButton.innerHTML = oldVal;
             saveButton.disabled = false;
-            window.alert("Ошибка сохранения");
+            errorInfoDiv.classList.remove('d-none');
         });
 }

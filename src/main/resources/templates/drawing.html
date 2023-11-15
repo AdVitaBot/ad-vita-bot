@@ -18,12 +18,15 @@
 <div class="container-fluid vh-100">
     <div class="" style="margin-top:200px">
         <div class="rounded d-flex justify-content-center">
-            <form class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
+            <form id="drawing-form" class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
                 <a id="back-btn" style="float: left" class="btn btn-outline-secondary"
                    th:href="@{/theme/drawings/} + ${themeId}">&lt;</a>
                 <input type="hidden" id="theme-id" th:value="${themeId}">
                 <div class="text-center" style="margin-bottom: 16px">
                     <h3 class="text-primary">Добавление изображения</h3>
+                </div>
+                <div id="error-info" class="d-none alert alert-danger" role="alert">
+                    Ошибка сохранения
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="drawing-caption">Название изображения</label>

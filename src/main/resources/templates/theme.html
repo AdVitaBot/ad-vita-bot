@@ -18,11 +18,17 @@
 <div class="container-fluid vh-100">
     <div class="" style="margin-top:200px">
         <div class="rounded d-flex justify-content-center">
-            <form class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
+            <form id="theme-form" class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
                 <a style="float: left" class="btn btn-outline-secondary" th:href="@{/themes}">&lt;</a>
                 <input type="hidden" id="theme-id" th:value="${theme.id}">
                 <div class="text-center" style="margin-bottom: 16px">
                     <h3 class="text-primary">Редактирование темы</h3>
+                </div>
+                <div id="success-info" class="d-none alert alert-success" role="alert">
+                    Сохранено успешно
+                </div>
+                <div id="error-info" class="d-none alert alert-danger" role="alert">
+                    Ошибка сохранения
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="theme-description">Название темы</label>
