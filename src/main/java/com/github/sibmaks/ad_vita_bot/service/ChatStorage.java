@@ -1,6 +1,7 @@
 package com.github.sibmaks.ad_vita_bot.service;
 
-import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.dto.Theme;
+import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -43,9 +44,9 @@ public class ChatStorage {
      * @param chatId chat identifier
      * @return chat chosen theme
      */
-    public String getTheme(long chatId) {
+    public Theme getTheme(long chatId) {
         var chatData = datas.computeIfAbsent(chatId, it -> new ConcurrentHashMap<>());
-        return (String) chatData.get("theme");
+        return (Theme) chatData.get("theme");
     }
 
     /**
@@ -54,7 +55,7 @@ public class ChatStorage {
      * @param chatId chat identifier
      * @param theme chat chosen theme
      */
-    public void setTheme(long chatId, String theme) {
+    public void setTheme(long chatId, Theme theme) {
         var chatData = datas.computeIfAbsent(chatId, it -> new ConcurrentHashMap<>());
         chatData.put("theme", theme);
     }

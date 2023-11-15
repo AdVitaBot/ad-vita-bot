@@ -1,4 +1,4 @@
-package com.github.sibmaks.ad_vita_bot.entity;
+package com.github.sibmaks.ad_vita_bot.dto;
 
 import lombok.*;
 

@@ -1,31 +1,36 @@
 package com.github.sibmaks.ad_vita_bot.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.sibmaks.ad_vita_bot.entity.Localization;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
+import com.github.sibmaks.ad_vita_bot.entity.LocalizationEntity;
+import com.github.sibmaks.ad_vita_bot.repository.LocalizationRepository;
+import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author sibmaks
  * @since 0.0.1
  */
+@Slf4j
 @Service
 public class LocalisationService {
-    private final Map<String, String> defaultLocalizations;
+    private final Map<String, String> cachedLocalizations;
+    private final LocalizationRepository localizationRepository;
 
-    @SneakyThrows
-    public LocalisationService(@Value("classpath:i18n/ru.json")
-                               Resource defaultLocalizations,
-                               ObjectMapper objectMapper) {
-        var localizations = objectMapper.readValue(defaultLocalizations.getInputStream(), Localization[].class);
-        this.defaultLocalizations = Arrays.stream(localizations)
-                .collect(Collectors.toMap(Localization::getCode, Localization::getMessage));
+    public LocalisationService(LocalizationRepository localizationRepository) {
+        this.localizationRepository = localizationRepository;
+        this.cachedLocalizations = new ConcurrentHashMap<>();
+    }
+
+    @PostConstruct
+    public void init() {
+        log.debug("Start localization loading");
+        for (var localizationEntity : localizationRepository.findAll()) {
+            cachedLocalizations.put(localizationEntity.getCode(), localizationEntity.getMessage());
+        }
+        log.debug("Localization loaded");
     }
 
     /**
@@ -35,7 +40,13 @@ public class LocalisationService {
      * @return localized message
      */
     public String getLocalization(String code) {
-        return defaultLocalizations.get(code);
+        return cachedLocalizations.computeIfAbsent(code, this::loadLocalization);
+    }
+
+    private String loadLocalization(String code) {
+        return localizationRepository.findById(code)
+                .map(LocalizationEntity::getMessage)
+                .orElseThrow(() -> new IllegalArgumentException("Localization %s does not exists"));
     }
 
 }

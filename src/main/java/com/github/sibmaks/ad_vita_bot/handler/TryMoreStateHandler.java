@@ -4,9 +4,7 @@ import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
 import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
 import com.github.sibmaks.ad_vita_bot.exception.SendRsException;
-import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
-import com.github.sibmaks.ad_vita_bot.service.TelegramBotStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +18,6 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author sibmaks
@@ -29,15 +26,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
-public class ChooseThemeStateHandler implements StateHandler {
-
-    private final ChatStorage chatStorage;
-    private final TelegramBotStorage telegramBotStorage;
+public class TryMoreStateHandler implements StateHandler {
     private final LocalisationService localisationService;
 
     @Override
     public UserFlowState getHandledState() {
-        return UserFlowState.CHOOSE_THEME;
+        return UserFlowState.TRY_MORE;
     }
 
     @Override
@@ -45,9 +39,8 @@ public class ChooseThemeStateHandler implements StateHandler {
         var command = buildEnterMessage(chatId);
 
         try {
-            log.debug("[{}] Send chose theme message", chatId);
-            var rs = sender.execute(command);
-            log.debug("[{}] Rs was sent: {}", chatId, rs.getMessageId());
+            log.debug("[{}] Send try more message", chatId);
+            sender.execute(command);
         } catch (TelegramApiException e) {
             log.error("Message sending error", e);
             throw new SendRsException("Message sending error",e);
@@ -62,59 +55,24 @@ public class ChooseThemeStateHandler implements StateHandler {
             return Transition.stop();
         }
         var callbackQuery = update.getCallbackQuery();
-        var themeId = Integer.parseInt(callbackQuery.getData());
-        var theme = telegramBotStorage.findThemeById(themeId);
-        if (theme != null) {
-            chatStorage.setTheme(chatId, theme);
-            hideKeyboard(chatId, sender, callbackQuery, log);
-
-            return Transition.go(UserFlowState.CHOOSE_AMOUNT);
-        } else {
-            var command = buildErrorMessage(chatId);
-
-            try {
-                log.warn("[{}] Send unknown theme chosen", chatId);
-                var rs = sender.execute(command);
-                log.debug("[{}] Rs was sent: {}", chatId, rs.getMessageId());
-            } catch (TelegramApiException e) {
-                log.error("Message sending error", e);
-                throw new SendRsException("Message sending error",e);
-            }
-
-            return Transition.stop();
-        }
+        hideKeyboard(chatId, sender, callbackQuery, log);
+        return Transition.go(UserFlowState.CHOOSE_THEME);
     }
 
     @NotNull
     private SendMessage buildEnterMessage(Long chatId) {
         return SendMessage.builder()
                 .chatId(chatId)
-                .text(localisationService.getLocalization("pick_one_theme_text"))
-                .replyMarkup(replyKeyboard())
-                .build();
-    }
-
-    @NotNull
-    private SendMessage buildErrorMessage(Long chatId) {
-        return SendMessage.builder()
-                .chatId(chatId)
-                .text(localisationService.getLocalization("pick_exists_theme_text"))
+                .text(localisationService.getLocalization("thankfully_message_text"))
                 .replyMarkup(replyKeyboard())
                 .build();
     }
 
     private InlineKeyboardMarkup replyKeyboard() {
-        var themes = telegramBotStorage.getThemes();
-        var keyboardRows = themes.stream()
-                .map(it -> List.of(inlineKeyboardButton(it.getText(), String.valueOf(it.getId()))))
-                .collect(Collectors.toList());
+        var tryMoreButton = localisationService.getLocalization("try_more_button_text");
         return InlineKeyboardMarkup.builder()
-                .keyboard(keyboardRows)
                 .keyboardRow(List.of(
-                        urlInlineKeyboardButton(
-                                localisationService.getLocalization("about_fund_text"),
-                                localisationService.getLocalization("fund_url")
-                        )
+                        inlineKeyboardButton(tryMoreButton, "repeat")
                 ))
                 .build();
     }
@@ -126,10 +84,4 @@ public class ChooseThemeStateHandler implements StateHandler {
         return button;
     }
 
-    public InlineKeyboardButton urlInlineKeyboardButton(String text, String url) {
-        var button = new InlineKeyboardButton();
-        button.setText(text);
-        button.setUrl(url);
-        return button;
-    }
 }
