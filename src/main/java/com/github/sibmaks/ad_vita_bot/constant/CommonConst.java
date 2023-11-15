@@ -12,4 +12,5 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class CommonConst {
     public static final BigDecimal HUNDRED = BigDecimal.TEN.multiply(BigDecimal.TEN);
+    public static final String HEADER_SESSION_ID = "X-Session-Id";
 }
