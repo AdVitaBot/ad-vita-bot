@@ -1,7 +1,7 @@
 package com.github.sibmaks.ad_vita_bot.service;
 
 import com.github.sibmaks.ad_vita_bot.entity.Participant;
-import com.github.sibmaks.ad_vita_bot.repos.ParticipantRepository;
+import com.github.sibmaks.ad_vita_bot.repository.ParticipantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

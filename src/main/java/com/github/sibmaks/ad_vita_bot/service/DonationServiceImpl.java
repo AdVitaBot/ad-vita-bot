@@ -3,7 +3,7 @@ package com.github.sibmaks.ad_vita_bot.service;
 import com.github.sibmaks.ad_vita_bot.entity.Donation;
 import com.github.sibmaks.ad_vita_bot.entity.DonationStatus;
 import com.github.sibmaks.ad_vita_bot.entity.Participant;
-import com.github.sibmaks.ad_vita_bot.repos.DonationRepository;
+import com.github.sibmaks.ad_vita_bot.repository.DonationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

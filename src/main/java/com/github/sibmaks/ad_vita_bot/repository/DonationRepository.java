@@ -1,4 +1,4 @@
-package com.github.sibmaks.ad_vita_bot.repos;
+package com.github.sibmaks.ad_vita_bot.repository;
 
 import com.github.sibmaks.ad_vita_bot.entity.Donation;
 import com.github.sibmaks.ad_vita_bot.entity.Participant;
