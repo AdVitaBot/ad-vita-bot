@@ -83,6 +83,18 @@ public class UIController {
         return "theme";
     }
 
+    @GetMapping("/theme/drawings/{themeId}")
+    public String editDrawings(HttpServletRequest request, Model model, @PathVariable(name = "themeId") String themeId) {
+        var sessionId = getSessionId(request);
+        if(sessionId == null) {
+            return "redirect:/index";
+        }
+        var theme = telegramBotStorage.findThemeById(Long.parseLong(themeId));
+        model.addAttribute("drawings", theme.getDrawings());
+        model.addAttribute("themeId", themeId);
+        return "drawings";
+    }
+
     @GetMapping("/bot_props")
     public String getRooms(HttpServletRequest request, Model model) {
         var sessionId = getSessionId(request);

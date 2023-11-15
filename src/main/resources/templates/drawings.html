@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdVitaBot Admin Panel</title>
+    <link th:href="@{/libs/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/libs/fontawesome/css/all.min.css}" rel="stylesheet">
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+    <script th:src="@{/libs/js/jquery.min.js}"></script>
+    <script th:src="@{/js/core.js}" lang="js"></script>
+</head>
+<body>
+<div class="button-navbar">
+    <button class="btn-sm btn-primary rounded-circle" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+</div>
+<div class="container-fluid vh-100">
+    <div class="" style="margin-top:200px">
+        <div class="rounded d-flex justify-content-center">
+            <div class="col-md-10 col-sm-12 shadow-lg p-5 bg-light">
+                <a style="float: left" class="btn btn-outline-secondary" th:href="@{/themes}">&lt;</a>
+                <div class="text-center">
+                    <span class="h3 text-primary">Изображения</span>
+                    <a th:href="@{/theme/drawings/} + ${themeId} + '/add'" class="float-end btn btn-outline-primary">Добавить</a>
+                </div>
+                <div class="row m-4">
+                    <div class="col-md-4 mb-3" th:id="'drawing-card-' + ${drawing.id}" th:each="drawing : ${drawings}">
+                        <div class="card">
+                            <img th:src="@{/api/drawing/get/} + ${drawing.id}" class="card-img-top"
+                                 th:alt="${drawing.caption}"/>
+                            <div class="card-body">
+                                <h5 class="card-title" th:text="${drawing.caption}"></h5>
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-outline-danger" onclick="removeDrawing(this)" th:data-drawing-id="${drawing.id}">Удалить</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/drawings.js}"></script>
+</div>
+</body>
+</html>
