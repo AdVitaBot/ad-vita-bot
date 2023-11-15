@@ -3,6 +3,7 @@ package com.github.sibmaks.ad_vita_bot.controller;
 import com.github.sibmaks.ad_vita_bot.constant.CommonConst;
 import com.github.sibmaks.ad_vita_bot.entity.Drawing;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
+import com.github.sibmaks.ad_vita_bot.service.SessionService;
 import com.github.sibmaks.ad_vita_bot.service.TelegramBotStorage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class UIController {
     private final LocalisationService localisationService;
     private final TelegramBotStorage telegramBotStorage;
+    private final SessionService sessionService;
 
     /**
      * Index page, redirect on rooms page if client is authorized.
@@ -47,7 +49,7 @@ public class UIController {
     public String getMenu(HttpServletRequest request) {
         var sessionId = getSessionId(request);
         if(sessionId == null) {
-            return "redirect:/index";
+            return "redirect:/";
         }
         return "menu";
     }
@@ -56,7 +58,7 @@ public class UIController {
     public String getLocalizations(HttpServletRequest request, Model model) {
         var sessionId = getSessionId(request);
         if(sessionId == null) {
-            return "redirect:/index";
+            return "redirect:/";
         }
         var localizations = localisationService.getLocalizations();
         model.addAttribute("localizations", localizations);
@@ -67,7 +69,7 @@ public class UIController {
     public String getThemes(HttpServletRequest request, Model model) {
         var sessionId = getSessionId(request);
         if(sessionId == null) {
-            return "redirect:/index";
+            return "redirect:/";
         }
         var themes = telegramBotStorage.getThemes();
         model.addAttribute("themes", themes);
@@ -78,7 +80,7 @@ public class UIController {
     public String editTheme(HttpServletRequest request, Model model, @PathVariable(name = "themeId") String themeId) {
         var sessionId = getSessionId(request);
         if(sessionId == null) {
-            return "redirect:/index";
+            return "redirect:/";
         }
         var theme = telegramBotStorage.findThemeById(Long.parseLong(themeId));
         model.addAttribute("theme", theme);
@@ -89,7 +91,7 @@ public class UIController {
     public String editDrawings(HttpServletRequest request, Model model, @PathVariable(name = "themeId") String themeId) {
         var sessionId = getSessionId(request);
         if(sessionId == null) {
-            return "redirect:/index";
+            return "redirect:/";
         }
         var theme = telegramBotStorage.findThemeById(Long.parseLong(themeId));
         var activeDrawings = theme.getDrawings().stream()
@@ -104,7 +106,7 @@ public class UIController {
     public String addDrawings(HttpServletRequest request, Model model, @PathVariable(name = "themeId") String themeId) {
         var sessionId = getSessionId(request);
         if(sessionId == null) {
-            return "redirect:/index";
+            return "redirect:/";
         }
         model.addAttribute("themeId", themeId);
         return "drawing";
@@ -114,7 +116,7 @@ public class UIController {
     public String getRooms(HttpServletRequest request, Model model) {
         var sessionId = getSessionId(request);
         if(sessionId == null) {
-            return "redirect:/index";
+            return "redirect:/";
         }
         var deactivationDate = telegramBotStorage.getDeactivationDate();
         model.addAttribute("deactivation_date", deactivationDate.format(DateTimeFormatter.ISO_DATE));
@@ -130,15 +132,21 @@ public class UIController {
      * @param request http servlet request
      * @return session identifier
      */
-    private static String getSessionId(HttpServletRequest request) {
+    private String getSessionId(HttpServletRequest request) {
         var header = request.getHeader(CommonConst.HEADER_SESSION_ID);
         if(header == null && request.getCookies() != null) {
             for (var cookie : request.getCookies()) {
                 if(CommonConst.HEADER_SESSION_ID.equals(cookie.getName())) {
-                    return cookie.getValue();
+                    header = cookie.getValue();
+                    break;
                 }
             }
         }
-        return header;
+        if(header != null) {
+            if(sessionService.isActive(header)) {
+                return header;
+            }
+        }
+        return null;
     }
 }

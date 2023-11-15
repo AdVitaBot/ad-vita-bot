@@ -1,6 +1,7 @@
 package com.github.sibmaks.ad_vita_bot.controller;
 
 import com.github.sibmaks.ad_vita_bot.api.rq.UpdateThemeRq;
+import com.github.sibmaks.ad_vita_bot.auth.Authorized;
 import com.github.sibmaks.ad_vita_bot.service.ThemeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class ThemeController {
     private final ThemeService themeService;
 
+    @Authorized
     @PostMapping(path = "update", produces = MediaType.APPLICATION_JSON_VALUE)
     public void update(@RequestBody @Validated UpdateThemeRq rq) {
-        // accept {@link CommonConst#HEADER_SESSION_ID} as auth header
         themeService.updateTheme(rq.getId(), rq.getDescription(), rq.getMinDonationAmount(), rq.getMaxDonationAmount());
     }
 

@@ -1,6 +1,7 @@
 package com.github.sibmaks.ad_vita_bot.controller;
 
 import com.github.sibmaks.ad_vita_bot.api.rq.UpdatePropertiesRq;
+import com.github.sibmaks.ad_vita_bot.auth.Authorized;
 import com.github.sibmaks.ad_vita_bot.service.TelegramBotStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class BotPropertiesController {
     private final TelegramBotStorage telegramBotStorage;
 
+    @Authorized
     @PostMapping(path = "update", produces = MediaType.APPLICATION_JSON_VALUE)
     public void update(@RequestBody @Validated UpdatePropertiesRq rq) {
-        // accept {@link CommonConst#HEADER_SESSION_ID} as auth header
         telegramBotStorage.setSettings(rq.getInvoiceProviderToken(), rq.getDeactivationDate());
     }
 

@@ -6,5 +6,6 @@ package com.github.sibmaks.ad_vita_bot.constant;
  */
 public enum ServiceError {
     SEND_RS_EXCEPTION,
-    UNEXPECTED_ERROR
+    UNEXPECTED_ERROR,
+    UNAUTHORIZED
 }

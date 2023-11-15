@@ -9,7 +9,7 @@ function getSessionId() {
 function logout() {
     $.ajax({
         method: "GET",
-        url: "/api/user/logout",
+        url: "/ad_vita_bot/api/auth/logout",
         headers: {'X-Session-Id': getSessionId()},
         contentType: "application/json"
     })
