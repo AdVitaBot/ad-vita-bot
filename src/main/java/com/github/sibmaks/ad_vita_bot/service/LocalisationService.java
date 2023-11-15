@@ -46,7 +46,7 @@ public class LocalisationService {
     private String loadLocalization(String code) {
         return localizationRepository.findById(code)
                 .map(LocalizationEntity::getMessage)
-                .orElseThrow(() -> new IllegalArgumentException("Localization %s does not exists"));
+                .orElseThrow(() -> new IllegalArgumentException("Localization %s does not exists".formatted(code)));
     }
 
 }

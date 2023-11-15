@@ -3,7 +3,7 @@ package com.github.sibmaks.ad_vita_bot.bot;
 import com.github.sibmaks.ad_vita_bot.conf.TelegramBotProperties;
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
-import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
 import com.github.sibmaks.ad_vita_bot.exception.SendRsException;
 import com.github.sibmaks.ad_vita_bot.exception.ServiceException;
 import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
@@ -92,13 +92,20 @@ public class TelegramStateBot extends TelegramLongPollingBot {
             chatStorage.setState(chatId, state);
         } catch (ServiceException e) {
             log.error("[%s] Technical issue happened, code: %s".formatted(chatId, e.getServiceError()), e);
-            var command = buildTechnicalErrorMessage(chatId);
-            try {
-                log.warn("[{}] Send technical issue message", chatId);
-                execute(command);
-            } catch (TelegramApiException inner) {
-                log.error("Last hope error", inner);
-            }
+            sendTechnicalIssueMessage(chatId);
+        } catch (Exception e) {
+            log.error("[%s] Unexpected exception happened", e);
+            sendTechnicalIssueMessage(chatId);
+        }
+    }
+
+    private void sendTechnicalIssueMessage(Long chatId) {
+        var command = buildTechnicalErrorMessage(chatId);
+        try {
+            log.warn("[{}] Send technical issue message", chatId);
+            execute(command);
+        } catch (TelegramApiException inner) {
+            log.error("Last hope error", inner);
         }
     }
 

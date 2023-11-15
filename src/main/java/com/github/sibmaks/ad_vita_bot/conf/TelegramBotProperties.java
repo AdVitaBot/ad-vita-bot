@@ -1,6 +1,6 @@
 package com.github.sibmaks.ad_vita_bot.conf;
 
-import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,5 +21,6 @@ import org.springframework.context.annotation.Configuration;
 public class TelegramBotProperties {
     private String name;
     private String token;
+    private int maxCachedParticipants = 512;
     private UserFlowState initialFlowState = UserFlowState.WELCOME;
 }

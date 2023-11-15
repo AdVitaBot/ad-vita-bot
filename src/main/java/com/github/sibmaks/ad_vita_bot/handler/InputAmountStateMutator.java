@@ -2,11 +2,10 @@ package com.github.sibmaks.ad_vita_bot.handler;
 
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
-import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
 import com.github.sibmaks.ad_vita_bot.exception.SendRsException;
 import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
-import com.github.sibmaks.ad_vita_bot.service.TelegramBotStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -29,11 +28,9 @@ import java.util.regex.Pattern;
 @Component
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class InputAmountStateMutator implements StateHandler {
-    private static final BigDecimal HUNDRED = BigDecimal.TEN.multiply(BigDecimal.TEN);
     private static final Pattern AMOUNT_PATTERN = Pattern.compile("^([0-9])+(.[0-9]{1,2})?$");
 
     private final ChatStorage chatStorage;
-    private final TelegramBotStorage telegramBotStorage;
     private final LocalisationService localisationService;
 
     @Override
@@ -66,8 +63,9 @@ public class InputAmountStateMutator implements StateHandler {
             return Transition.stop();
         }
         var text = message.getText();
-        if (isValid(text)) {
-            chatStorage.setAmount(chatId, text);
+        var amount = tryParseAmount(text);
+        if (amount != null && isValid(chatId, amount)) {
+            chatStorage.setAmount(chatId, amount);
             return Transition.go(UserFlowState.INVOICE);
         } else {
             var command = buildErrorMessage(chatId);
@@ -84,21 +82,21 @@ public class InputAmountStateMutator implements StateHandler {
         }
     }
 
-    private boolean isValid(String text) {
+    private boolean isValid(long chatId, BigDecimal amount) {
+        var theme = chatStorage.getTheme(chatId);
+        var minAmount = theme.getMinDonationAmount();
+        var maxAmount = theme.getMaxDonationAmount();
+        return amount.compareTo(minAmount) >= 0 && amount.compareTo(maxAmount) <= 0;
+    }
+
+    private BigDecimal tryParseAmount(String text) {
         try {
             if(!AMOUNT_PATTERN.matcher(text).matches()) {
-                return false;
+                return null;
             }
-
-            var amount = new BigDecimal(text);
-            var minAmount = telegramBotStorage.getMinAmount();
-            var maxAmount = telegramBotStorage.getMaxAmount();
-
-            var amountKopecks = amount.multiply(HUNDRED).intValue();
-
-            return amountKopecks >= minAmount && amountKopecks <= maxAmount;
-        } catch (Exception e) {
-            return false;
+            return new BigDecimal(text);
+        } catch (Exception ignored) {
+            return null;
         }
     }
 

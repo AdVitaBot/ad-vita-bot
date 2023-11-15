@@ -2,19 +2,12 @@ package com.github.sibmaks.ad_vita_bot.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.sql.Blob;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,11 +23,11 @@ import java.util.Objects;
 public class Drawing {
     @Id
     private Long id;
-
+    @Column(name = "caption")
     private String caption;
 
-    @Lob
-    private Blob image;
+    @Column(name = "image")
+    private byte[] image;
 
     @ManyToOne
     @JoinColumn(name = "theme_id", nullable = false)

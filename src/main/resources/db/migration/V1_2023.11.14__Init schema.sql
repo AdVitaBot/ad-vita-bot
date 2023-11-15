@@ -1,12 +1,3 @@
-CREATE TABLE IF NOT EXISTS "participant"
-(
-    "chat_id" INTEGER     NOT NULL UNIQUE,
-    "state"   VARCHAR(32) NOT NULL
-);
-
-COMMENT ON COLUMN "participant".chat_id IS 'Participant chat identifier';
-COMMENT ON COLUMN "participant".state IS 'Participant state in bot';
-
 CREATE TABLE IF NOT EXISTS "theme"
 (
     "id"                  SERIAL PRIMARY KEY,
@@ -19,6 +10,19 @@ COMMENT ON COLUMN "theme".id IS 'Theme unique id';
 COMMENT ON COLUMN "theme".min_donation_amount IS 'Minimum donation amount on this theme';
 COMMENT ON COLUMN "theme".max_donation_amount IS 'Maximum donation amount on this theme';
 COMMENT ON COLUMN "theme".description IS 'Theme user friendly description';
+
+CREATE TABLE IF NOT EXISTS "participant"
+(
+    "chat_id"  INTEGER     NOT NULL UNIQUE,
+    "state"    VARCHAR(32) NOT NULL,
+    "theme_id" INTEGER,
+    "amount"   NUMERIC(10, 2)
+);
+
+COMMENT ON COLUMN "participant".chat_id IS 'Participant chat identifier';
+COMMENT ON COLUMN "participant".state IS 'Participant state in bot';
+COMMENT ON COLUMN "participant".theme_id IS 'Participant currently chosen theme';
+COMMENT ON COLUMN "participant".amount IS 'Participant amount to donate';
 
 CREATE TABLE IF NOT EXISTS "drawing"
 (
@@ -39,12 +43,12 @@ ALTER TABLE "drawing"
     DROP CONSTRAINT IF EXISTS "drawing_theme",
     ADD CONSTRAINT "drawing_theme" FOREIGN KEY ("theme_id") REFERENCES "theme" ("id") ON DELETE CASCADE;
 
-CREATE TABLE "donation"
+CREATE TABLE IF NOT EXISTS "donation"
 (
     "id"             SERIAL PRIMARY KEY,
     "status"         VARCHAR(64)    NOT NULL,
-    "donator_name"   VARCHAR(512)   NOT NULL,
-    "donator_email"  VARCHAR(512)   NOT NULL,
+    "donator_name"   VARCHAR(512),
+    "donator_email"  VARCHAR(512),
     "participant_id" INTEGER        NOT NULL,
     "drawing_id"     INTEGER        NOT NULL,
     "amount"         NUMERIC(10, 2) NOT NULL,
@@ -60,7 +64,7 @@ COMMENT ON COLUMN "donation".drawing_id IS 'Foreign key on drawing';
 COMMENT ON COLUMN "donation".amount IS 'Donation amount';
 COMMENT ON COLUMN "donation".donation_date IS 'Donation date';
 
-CREATE INDEX IF NOT EXISTS "idx_donation__participant_id_status" ON "donation" ("participant_id", "status");
+CREATE INDEX IF NOT EXISTS "idx_donation__participant_id_drawing_id_status" ON "donation" ("participant_id", "drawing_id", "status");
 
 ALTER TABLE "donation"
     DROP CONSTRAINT IF EXISTS "donation_participant",
@@ -68,7 +72,7 @@ ALTER TABLE "donation"
     DROP CONSTRAINT IF EXISTS "donation_drawing",
     ADD CONSTRAINT "donation_drawing" FOREIGN KEY ("drawing_id") REFERENCES "drawing" ("id");
 
-CREATE TABLE "localization"
+CREATE TABLE IF NOT EXISTS "localization"
 (
     "code"    VARCHAR(64) NOT NULL UNIQUE,
     "message" TEXT        NOT NULL
@@ -77,7 +81,7 @@ CREATE TABLE "localization"
 COMMENT ON COLUMN "localization".code IS 'Localization unique code';
 COMMENT ON COLUMN "localization".message IS 'Localization message';
 
-CREATE TABLE "bot_parameters"
+CREATE TABLE IF NOT EXISTS "bot_parameters"
 (
     "code"  VARCHAR(64)   NOT NULL UNIQUE,
     "name"  VARCHAR(64)   NOT NULL,

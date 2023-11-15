@@ -1,8 +1,9 @@
 package com.github.sibmaks.ad_vita_bot.service;
 
-import com.github.sibmaks.ad_vita_bot.dto.Theme;
 import com.github.sibmaks.ad_vita_bot.entity.BotParameterEntity;
+import com.github.sibmaks.ad_vita_bot.entity.Theme;
 import com.github.sibmaks.ad_vita_bot.repository.BotParametersRepository;
+import com.github.sibmaks.ad_vita_bot.repository.ThemeRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,14 +18,14 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Service
 public class TelegramBotStorage {
-    private final LocalisationService localisationService;
     private final BotParametersRepository botParametersRepository;
     private final Map<String, BotParameterEntity> cachedParameters;
+    private final ThemeRepository themeRepository;
 
-    public TelegramBotStorage(LocalisationService localisationService,
-                              BotParametersRepository botParametersRepository) {
-        this.localisationService = localisationService;
+    public TelegramBotStorage(BotParametersRepository botParametersRepository,
+                              ThemeRepository themeRepository) {
         this.botParametersRepository = botParametersRepository;
+        this.themeRepository = themeRepository;
         this.cachedParameters = new ConcurrentHashMap<>();
     }
 
@@ -60,35 +61,11 @@ public class TelegramBotStorage {
      * @return themes list
      */
     public List<Theme> getThemes() {
-        return List.of(
-                new Theme(1, localisationService.getLocalization("theme_1_name")),
-                new Theme(2, localisationService.getLocalization("theme_2_name"))
-        );
+        return themeRepository.getAllBy();
     }
 
-    /**
-     * Min charity amount in kopecks
-     * {@see https://core.telegram.org/bots/payments#supported-currencies}
-     * @return min charity
-     */
-    public int getMinAmount() {
-        return 100_00;
-    }
-
-
-    /**
-     * Max charity amount in kopecks
-     * {@see https://core.telegram.org/bots/payments#supported-currencies}
-     * @return max charity
-     */
-    public int getMaxAmount() {
-        return 900_000_00;
-    }
-
-    public Theme findThemeById(int themeId) {
-        return getThemes().stream()
-                .filter(it -> it.getId() == themeId)
-                .findFirst()
+    public Theme findThemeById(long themeId) {
+        return themeRepository.findById(themeId)
                 .orElse(null);
     }
 }

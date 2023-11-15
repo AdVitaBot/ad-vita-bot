@@ -2,7 +2,7 @@ package com.github.sibmaks.ad_vita_bot.handler;
 
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
-import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
 import com.github.sibmaks.ad_vita_bot.exception.SendRsException;
 import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
@@ -18,6 +18,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMa
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -66,7 +67,8 @@ public class ChooseAmountStateMutator implements StateHandler {
         if (OTHER_AMOUNT.equals(data)) {
             return Transition.go(UserFlowState.INPUT_AMOUNT);
         } else {
-            chatStorage.setAmount(chatId, data);
+            var amount = new BigDecimal(data);
+            chatStorage.setAmount(chatId, amount);
             return Transition.go(UserFlowState.INVOICE);
         }
     }

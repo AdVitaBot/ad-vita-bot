@@ -21,8 +21,6 @@ VALUES ('welcome_text', 'Благодарим вас за интерес к ак
        ('try_more_button_text', 'Ещё картинку'),
        ('thankfully_message_text',
         'Мы вместе с Татьяной Задорожней желаем хорошего дня и благодарим за помощь подопечным фонда AdVita!'),
-       ('theme_1_name', 'Печеньки с предсказаниями'),
-       ('theme_2_name', 'Твое внутреннее я'),
        ('theme_1_message_text', 'Ловите вашу печеньку с предсказанием'),
        ('theme_2_message_text', 'Ловите ваше внутренне я'),
        ('other_amount_text', 'Другая сумма'),
@@ -32,7 +30,8 @@ VALUES ('welcome_text', 'Благодарим вас за интерес к ак
        ('invoice_title', 'Пожертвование'),
        ('invoice_description', 'Пожертвование в фонд AdVita'),
        ('invoice_price_label', 'Пожертвование'),
-       ('goodbye_message', 'Наша акция завершена, спасибо за участие!')
+       ('goodbye_message', 'Наша акция завершена, спасибо за участие!'),
+       ('technical_error_text', 'Произошла техническая ошибка, напашите нам на почту donation@advita.ru')
 ON CONFLICT DO NOTHING;
 
 /**

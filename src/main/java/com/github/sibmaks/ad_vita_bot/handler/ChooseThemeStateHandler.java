@@ -2,7 +2,7 @@ package com.github.sibmaks.ad_vita_bot.handler;
 
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
-import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
 import com.github.sibmaks.ad_vita_bot.exception.SendRsException;
 import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
@@ -106,7 +106,7 @@ public class ChooseThemeStateHandler implements StateHandler {
     private InlineKeyboardMarkup replyKeyboard() {
         var themes = telegramBotStorage.getThemes();
         var keyboardRows = themes.stream()
-                .map(it -> List.of(inlineKeyboardButton(it.getText(), String.valueOf(it.getId()))))
+                .map(it -> List.of(inlineKeyboardButton(it.getDescription(), String.valueOf(it.getId()))))
                 .collect(Collectors.toList());
         return InlineKeyboardMarkup.builder()
                 .keyboard(keyboardRows)

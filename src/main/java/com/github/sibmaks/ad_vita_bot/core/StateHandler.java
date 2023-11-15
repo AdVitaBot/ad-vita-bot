@@ -1,6 +1,6 @@
 package com.github.sibmaks.ad_vita_bot.core;
 
-import com.github.sibmaks.ad_vita_bot.dto.UserFlowState;
+import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
 import com.github.sibmaks.ad_vita_bot.exception.SendRsException;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;

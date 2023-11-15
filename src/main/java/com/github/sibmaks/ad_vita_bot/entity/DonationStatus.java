@@ -6,6 +6,7 @@ package com.github.sibmaks.ad_vita_bot.entity;
  */
 public enum DonationStatus {
     AWAITING_PAYMENT,
+    PRE_CHECK_QUERY,
     SUCCESSFUL,
     UNSUCCESSFUL
 }

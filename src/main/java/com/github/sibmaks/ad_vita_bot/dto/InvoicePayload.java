@@ -15,5 +15,5 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class InvoicePayload implements Serializable {
     private Long chatId;
-    private Long userId;
+    private Long donationId;
 }

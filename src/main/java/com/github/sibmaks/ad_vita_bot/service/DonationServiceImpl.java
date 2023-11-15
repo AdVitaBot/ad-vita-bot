@@ -2,11 +2,13 @@ package com.github.sibmaks.ad_vita_bot.service;
 
 import com.github.sibmaks.ad_vita_bot.entity.Donation;
 import com.github.sibmaks.ad_vita_bot.entity.DonationStatus;
+import com.github.sibmaks.ad_vita_bot.entity.Drawing;
 import com.github.sibmaks.ad_vita_bot.entity.Participant;
 import com.github.sibmaks.ad_vita_bot.repository.DonationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,17 +25,18 @@ public class DonationServiceImpl implements DonationService {
     private DonationRepository donationRepository;
 
     @Override
-    public Donation createDonation(Long chatId, int amount) {
-        Participant participant = participantService.getParticipantByChatId(chatId);
+    public Donation createDonation(Long chatId, BigDecimal amount, Drawing drawing) {
+        var participant = participantService.getParticipantByChatId(chatId);
 
         if (participant == null) {
             return null;
         }
 
-        Donation donation = new Donation();
+        var donation = new Donation();
         donation.setDonationDate(LocalDateTime.now());
         donation.setStatus(DonationStatus.AWAITING_PAYMENT);
         donation.setAmount(amount);
+        donation.setDrawing(drawing);
         donation.setParticipant(participant);
 
         return donationRepository.save(donation);

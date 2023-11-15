@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
@@ -35,13 +36,14 @@ public class Donation {
     @Enumerated(EnumType.STRING)
     private DonationStatus status;
 
-    private int amount;
+    @Column(name = "donator_name")
+    private String donatorName;
 
-    @Column(name = "donation_date", columnDefinition = "TIMESTAMP")
-    private LocalDateTime donationDate;
+    @Column(name = "donator_email")
+    private String donatorEmail;
 
     @ManyToOne
-    @JoinColumn(name = "chat_id", nullable = false)
+    @JoinColumn(name = "participant_id", nullable = false)
     @JsonBackReference
     private Participant participant;
 
@@ -50,6 +52,12 @@ public class Donation {
     @JsonBackReference
     private Drawing drawing;
 
+    @Column(name = "amount", nullable = false)
+    private BigDecimal amount;
+
+    @Column(name = "donation_date", columnDefinition = "TIMESTAMP")
+    private LocalDateTime donationDate;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -57,7 +65,7 @@ public class Donation {
 
         Donation donation = (Donation) o;
 
-        if (amount != donation.amount) return false;
+        if (!Objects.equals(amount, donation.amount)) return false;
         if (!Objects.equals(id, donation.id)) return false;
         if (status != donation.status) return false;
         if (!Objects.equals(donationDate, donation.donationDate))
@@ -69,7 +77,7 @@ public class Donation {
     public int hashCode() {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (status != null ? status.hashCode() : 0);
-        result = 31 * result + amount;
+        result = 31 * result + (amount != null ? amount.hashCode() : 0);
         result = 31 * result + (donationDate != null ? donationDate.hashCode() : 0);
         result = 31 * result + (participant != null ? participant.hashCode() : 0);
         return result;
@@ -80,6 +88,10 @@ public class Donation {
         return "Donation{" +
                 "id=" + id +
                 ", status=" + status +
+                ", donatorName='" + donatorName + '\'' +
+                ", donatorEmail='" + donatorEmail + '\'' +
+                ", participant=" + participant +
+                ", drawing=" + drawing +
                 ", amount=" + amount +
                 ", donationDate=" + donationDate +
                 '}';

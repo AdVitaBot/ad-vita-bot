@@ -1,17 +1,13 @@
 package com.github.sibmaks.ad_vita_bot.entity;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 
@@ -24,19 +20,20 @@ import java.util.Objects;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "theme")
 public class Theme {
     @Id
     private Long id;
 
     @Column(name = "min_donation_amount")
-    private int minDonationAmount;
+    private BigDecimal minDonationAmount;
 
     @Column(name = "max_donation_amount")
-    private int maxDonationAmount;
+    private BigDecimal maxDonationAmount;
 
     private String description;
 
-    @OneToMany(mappedBy="theme", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "theme", fetch = FetchType.LAZY)
     @JsonManagedReference
     private List<Drawing> drawings;
 
@@ -44,22 +41,17 @@ public class Theme {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Theme theme = (Theme) o;
-
-        if (minDonationAmount != theme.minDonationAmount) return false;
-        if (maxDonationAmount != theme.maxDonationAmount) return false;
-        if (!Objects.equals(id, theme.id)) return false;
-        return Objects.equals(description, theme.description);
+        return Objects.equals(id, theme.id) &&
+                Objects.equals(minDonationAmount, theme.minDonationAmount) &&
+                Objects.equals(maxDonationAmount, theme.maxDonationAmount) &&
+                Objects.equals(description, theme.description) &&
+                Objects.equals(drawings, theme.drawings);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + minDonationAmount;
-        result = 31 * result + maxDonationAmount;
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        return result;
+        return Objects.hash(id, minDonationAmount, maxDonationAmount, description, drawings);
     }
 
     @Override
