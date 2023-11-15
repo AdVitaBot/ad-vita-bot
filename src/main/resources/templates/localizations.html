@@ -39,7 +39,7 @@
                                 <textarea class="form-control" th:id="'localization-' + ${localization.code}"  th:text="${localization.message}"></textarea>
                             </td>
                             <td>
-                                <button class="btn-sm btn-primary" onclick="updateLocalization(this)" th:data-localization-code="${localization.code}">Сохранить</button>
+                                <button class="float-end btn-sm btn-primary" onclick="updateLocalization(this)" th:data-localization-code="${localization.code}">Сохранить</button>
                             </td>
                         </tr>
                         </tbody>
