@@ -5,10 +5,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface DrawingRepository extends CrudRepository<Drawing, Long> {
 
     @Query(value = "select d.* from {h-schema}\"drawing\" d " +
-            "where d.theme_id = :themeId " +
+            "where d.theme_id = :themeId and d.active " +
             "order by (" +
             "select count(*) from {h-schema}\"donation\" dn " +
             "where dn.participant_id = :participantId and dn.drawing_id = d.id  and status = 'SUCCESSFUL'" +

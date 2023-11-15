@@ -1,6 +1,8 @@
 package com.github.sibmaks.ad_vita_bot.controller;
 
 import com.github.sibmaks.ad_vita_bot.constant.CommonConst;
+import com.github.sibmaks.ad_vita_bot.entity.Drawing;
+import com.github.sibmaks.ad_vita_bot.repository.DrawingRepository;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import com.github.sibmaks.ad_vita_bot.service.TelegramBotStorage;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
 
 /**
  * HTTP controller for getting moving around the app pages
@@ -24,6 +27,7 @@ import java.time.format.DateTimeFormatter;
 public class UIController {
     private final LocalisationService localisationService;
     private final TelegramBotStorage telegramBotStorage;
+    private final DrawingRepository drawingRepository;
 
     /**
      * Index page, redirect on rooms page if client is authorized.
@@ -90,9 +94,22 @@ public class UIController {
             return "redirect:/index";
         }
         var theme = telegramBotStorage.findThemeById(Long.parseLong(themeId));
-        model.addAttribute("drawings", theme.getDrawings());
+        var activeDrawings = theme.getDrawings().stream()
+                .filter(Drawing::isActive)
+                .collect(Collectors.toList());
+        model.addAttribute("drawings", activeDrawings);
         model.addAttribute("themeId", themeId);
         return "drawings";
+    }
+
+    @GetMapping("/theme/drawings/{themeId}/add")
+    public String addDrawings(HttpServletRequest request, Model model, @PathVariable(name = "themeId") String themeId) {
+        var sessionId = getSessionId(request);
+        if(sessionId == null) {
+            return "redirect:/index";
+        }
+        model.addAttribute("themeId", themeId);
+        return "drawing";
     }
 
     @GetMapping("/bot_props")
