@@ -35,9 +35,18 @@ public class UIController {
     public String index(HttpServletRequest request) {
         var sessionId = getSessionId(request);
         if(sessionId != null) {
-            return "redirect:/localizations";
+            return "redirect:/menu";
         }
         return "index";
+    }
+
+    @GetMapping("/menu")
+    public String getMenu(HttpServletRequest request) {
+        var sessionId = getSessionId(request);
+        if(sessionId == null) {
+            return "redirect:/index";
+        }
+        return "menu";
     }
 
     @GetMapping("/localizations")
