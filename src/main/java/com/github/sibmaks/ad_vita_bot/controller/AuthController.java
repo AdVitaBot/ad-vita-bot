@@ -1,13 +1,17 @@
 package com.github.sibmaks.ad_vita_bot.controller;
 
 import com.github.sibmaks.ad_vita_bot.api.rq.LoginRq;
-import com.github.sibmaks.ad_vita_bot.constant.CommonConst;
-import jakarta.servlet.http.HttpServletResponse;
+import com.github.sibmaks.ad_vita_bot.api.rs.LoginRs;
+import com.github.sibmaks.ad_vita_bot.security.TokenProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.UUID;
 
 /**
  * @author sibmaks
@@ -16,12 +20,27 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/auth/")
 public class AuthController {
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private TokenProvider tokenProvider;
 
     @PostMapping(path = "login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public void login(@RequestBody @Validated LoginRq loginRq, HttpServletResponse response) {
-        response.setHeader(CommonConst.HEADER_SESSION_ID, UUID.randomUUID().toString());
-        // TODO: login logic
+    public LoginRs login(@RequestBody @Validated LoginRq loginRq) {
         // should send {@link CommonConst#HEADER_SESSION_ID} with session identifier
+
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRq.getLogin(),
+                        loginRq.getPassword()
+                )
+        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = tokenProvider.createToken(authentication);
+
+        return new LoginRs(token);
     }
 
     @GetMapping(path = "logout", produces = MediaType.APPLICATION_JSON_VALUE)
