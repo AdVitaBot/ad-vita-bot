@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.time.format.DateTimeFormatter;
 
@@ -69,6 +70,17 @@ public class UIController {
         var themes = telegramBotStorage.getThemes();
         model.addAttribute("themes", themes);
         return "themes";
+    }
+
+    @GetMapping("/theme/edit/{themeId}")
+    public String editTheme(HttpServletRequest request, Model model, @PathVariable(name = "themeId") String themeId) {
+        var sessionId = getSessionId(request);
+        if(sessionId == null) {
+            return "redirect:/index";
+        }
+        var theme = telegramBotStorage.findThemeById(Long.parseLong(themeId));
+        model.addAttribute("theme", theme);
+        return "theme";
     }
 
     @GetMapping("/bot_props")
