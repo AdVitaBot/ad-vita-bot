@@ -67,7 +67,7 @@ public class TelegramBotStorage {
      * @return themes list
      */
     public List<Theme> getThemes() {
-        return themeRepository.getAllBy();
+        return themeRepository.getAllByOrderById();
     }
 
     public Theme findThemeById(long themeId) {

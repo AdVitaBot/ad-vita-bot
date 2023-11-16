@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ThemeRepository extends CrudRepository<Theme, Long> {
 
-    List<Theme> getAllBy();
+    List<Theme> getAllByOrderById();
 
     @NotNull
     @Override
