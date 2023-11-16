@@ -18,7 +18,7 @@
 <div class="container-fluid vh-100">
     <div class="" style="margin-top:200px">
         <div class="rounded d-flex justify-content-center">
-            <form id="theme-form" class="col-md-4 col-sm-12 shadow-lg p-5 bg-light">
+            <form id="theme-form" class="col-md-4 col-sm-12 shadow-lg p-5 bg-light" onsubmit="return false;">
                 <a style="float: left" class="btn btn-outline-secondary" th:href="@{/themes}">&lt;</a>
                 <input type="hidden" id="theme-id" th:value="${theme.id}">
                 <div class="text-center" style="margin-bottom: 16px">
