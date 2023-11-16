@@ -33,7 +33,8 @@
                     <input class="form-control" id="drawing-caption" type="text" required/>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label" for="drawing-image">Изображение</label>
+                    <label class="form-label" for="drawing-image"
+                           th:text="'Изображение (до ' + ${maxDrawingSize} + ' КБ)'"> </label>
                     <input class="form-control" id="drawing-image" type="file" required/>
                 </div>
                 <div class="mb-3">

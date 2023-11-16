@@ -1,13 +1,13 @@
 package com.github.sibmaks.ad_vita_bot.controller;
 
+import com.github.sibmaks.ad_vita_bot.conf.AdminProperties;
+import com.github.sibmaks.ad_vita_bot.conf.TelegramBotProperties;
 import com.github.sibmaks.ad_vita_bot.constant.CommonConst;
 import com.github.sibmaks.ad_vita_bot.entity.Drawing;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import com.github.sibmaks.ad_vita_bot.service.SessionService;
 import com.github.sibmaks.ad_vita_bot.service.TelegramBotStorage;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,11 +23,22 @@ import java.util.stream.Collectors;
  * @since 0.0.1
  */
 @Controller
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class UIController {
     private final LocalisationService localisationService;
     private final TelegramBotStorage telegramBotStorage;
     private final SessionService sessionService;
+    private final AdminProperties.DrawingProps drawingProps;
+
+    public UIController(LocalisationService localisationService,
+                        TelegramBotStorage telegramBotStorage,
+                        SessionService sessionService,
+                        TelegramBotProperties telegramBotProperties) {
+        this.localisationService = localisationService;
+        this.telegramBotStorage = telegramBotStorage;
+        this.sessionService = sessionService;
+        var adminProps = telegramBotProperties.getAdmin();
+        this.drawingProps = adminProps.getDrawing();
+    }
 
     /**
      * Index page, redirect on rooms page if client is authorized.
@@ -109,6 +120,7 @@ public class UIController {
             return "redirect:/";
         }
         model.addAttribute("themeId", themeId);
+        model.addAttribute("maxDrawingSize", drawingProps.getMaxFileSize() / 1024);
         return "drawing";
     }
 

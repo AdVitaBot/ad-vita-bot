@@ -37,7 +37,8 @@ public class DrawingServiceImpl implements DrawingService {
         this.themeRepository = themeRepository;
         this.drawingRepository = drawingRepository;
         this.tika = tika;
-        this.drawingProps = telegramBotProperties.getAdmin().getDrawing();
+        var adminProps = telegramBotProperties.getAdmin();
+        this.drawingProps = adminProps.getDrawing();
     }
 
     @Override
@@ -52,7 +53,7 @@ public class DrawingServiceImpl implements DrawingService {
         var drawingContent = decoder.decode(content);
         var maxFileSize = drawingProps.getMaxFileSize();
         if(drawingContent.length >= maxFileSize) {
-            throw new ServiceException("Файл слишком большой, максимум: %d КБ".formatted(maxFileSize / 1024), ServiceError.UNSUPPORTED_TYPE);
+            throw new ServiceException("Файл слишком большой: %d КБ".formatted(drawingContent.length / 1024 + 1), ServiceError.UNSUPPORTED_TYPE);
         }
         var mimeType = tika.detect(drawingContent);
         if(isNotSupported(mimeType)) {

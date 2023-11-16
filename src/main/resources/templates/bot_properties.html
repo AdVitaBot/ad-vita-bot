@@ -31,14 +31,18 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="invoice-provider-token">Токен платёжной системы</label>
-                    <input class="form-control" id="invoice-provider-token" type="text" required th:value="${invoice_provider_token}"/>
+                    <input class="form-control" id="invoice-provider-token" type="text" required
+                           th:value="${invoice_provider_token}"/>
                 </div>
                 <div class="mb-3">
                     <label class="form-label" for="deactivation-date">Дата деактивации год-месяц-день</label>
-                    <input class="form-control" id="deactivation-date" type="text" required th:value="${deactivation_date}"/>
+                    <input class="form-control" id="deactivation-date" type="date" min="2023-01-01" max="3000-12-31"
+                           required th:value="${deactivation_date}"/>
                 </div>
                 <div class="mb-3">
-                    <button id="save-btn" class="float-end btn btn-primary" type="button" onclick="saveBotProps()">Сохранить</button>
+                    <button id="save-btn" class="float-end btn btn-primary" type="button" onclick="saveBotProps()">
+                        Сохранить
+                    </button>
                 </div>
             </form>
         </div>
