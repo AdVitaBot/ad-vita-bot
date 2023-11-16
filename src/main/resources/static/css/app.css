@@ -35,3 +35,13 @@
 .part-groups {
   margin-top: 16px;
 }
+
+.drawing-card-img {
+  min-height: 196px;
+  max-height: 196px;
+  object-fit: cover;
+}
+
+.img-enlargable {
+  cursor: zoom-in;
+}
