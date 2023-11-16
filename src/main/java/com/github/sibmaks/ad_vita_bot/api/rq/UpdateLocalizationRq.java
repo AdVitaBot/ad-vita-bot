@@ -1,4 +1,4 @@
-package com.github.sibmaks.ad_vita_bot.api.rs;
+package com.github.sibmaks.ad_vita_bot.api.rq;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

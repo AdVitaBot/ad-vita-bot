@@ -1,12 +1,7 @@
 package com.github.sibmaks.ad_vita_bot.api.rs;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.jetbrains.annotations.NotNull;
-
-import java.io.Serializable;
 
 /**
  * @author sibmaks
@@ -14,9 +9,8 @@ import java.io.Serializable;
  */
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class UploadDrawingRs implements Serializable {
-    @NotNull
-    private Long id;
+public class UploadDrawingRs extends BodyStandardRs<Long> {
+    public UploadDrawingRs(Long body) {
+        super(body);
+    }
 }

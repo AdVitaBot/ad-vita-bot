@@ -1,5 +1,7 @@
 package com.github.sibmaks.ad_vita_bot.service;
 
+import com.github.sibmaks.ad_vita_bot.conf.AdminProperties;
+import com.github.sibmaks.ad_vita_bot.conf.TelegramBotProperties;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,11 +21,11 @@ public class SessionServiceImpl implements SessionService {
     private final String hashedPassword;
     private final Cache<String, String> sessionCache;
 
-    public SessionServiceImpl(@Value("${app.bot.admin.username}") String username,
-                              @Value("${app.bot.admin.password}") String password,
+    public SessionServiceImpl(TelegramBotProperties telegramBotProperties,
                               @Value("${app.bot.session.ttl:3600}") long ttl) {
-        this.username = username;
-        this.hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+        var admin = telegramBotProperties.getAdmin();
+        this.username = admin.getUsername();
+        this.hashedPassword = BCrypt.hashpw(admin.getPassword(), BCrypt.gensalt());
         this.sessionCache = CacheBuilder.newBuilder()
                 .expireAfterAccess(ttl, TimeUnit.SECONDS)
                 .build();

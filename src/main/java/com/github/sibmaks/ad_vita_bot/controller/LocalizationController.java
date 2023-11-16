@@ -1,6 +1,6 @@
 package com.github.sibmaks.ad_vita_bot.controller;
 
-import com.github.sibmaks.ad_vita_bot.api.rs.UpdateLocalizationRq;
+import com.github.sibmaks.ad_vita_bot.api.rq.UpdateLocalizationRq;
 import com.github.sibmaks.ad_vita_bot.auth.Authorized;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import lombok.RequiredArgsConstructor;

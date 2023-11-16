@@ -12,7 +12,7 @@ async function saveDrawing() {
         return;
     }
     const files = drawingImageInput.files;
-    if(!files || files.length === 0) {
+    if (!files || files.length === 0) {
         return;
     }
     const file = files[0];
@@ -40,8 +40,16 @@ async function saveDrawing() {
             backButton.click();
         })
         .fail(function (jqXHR) {
-            if(jqXHR.status === 401) {
+            errorInfoDiv.innerText = "Ошибка сохранения";
+            if (jqXHR.status === 401) {
                 window.location.reload();
+            } else if (jqXHR.status === 417) {
+                if (jqXHR.responseText) {
+                    const rsJson = JSON.parse(jqXHR.responseText);
+                    if (rsJson && rsJson.error && rsJson.error.message) {
+                        errorInfoDiv.innerText = rsJson.error.message;
+                    }
+                }
             }
             saveButton.innerHTML = oldVal;
             saveButton.disabled = false;

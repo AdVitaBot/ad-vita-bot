@@ -92,6 +92,8 @@ app.bot.admin.username=admin
 app.bot.admin.password=password
 # Токен бота от @BotFather
 app.bot.token = a12345
+# Количество секунд жизни сессии в административной панели
+app.bot.session.ttl=3600
 # --------------------------  App Config -----------------------------
 ```
 
