@@ -20,9 +20,13 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TelegramBotInitializer {
     private final TelegramStateBot telegramStateBot;
+    private final TelegramBotProperties telegramBotProperties;
 
     @EventListener(ContextRefreshedEvent.class)
     public void init() throws TelegramApiException {
+        if(!telegramBotProperties.isEnabled()) {
+            return;
+        }
         var telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
         try {
             telegramBotsApi.registerBot(telegramStateBot);

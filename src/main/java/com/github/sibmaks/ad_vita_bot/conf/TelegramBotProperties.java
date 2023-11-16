@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties("app.bot")
 public class TelegramBotProperties {
+    private boolean enabled = true;
     private String name;
     private String token;
     private int maxCachedParticipants = 512;
