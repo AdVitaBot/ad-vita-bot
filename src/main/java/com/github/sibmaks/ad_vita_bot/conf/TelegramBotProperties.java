@@ -23,6 +23,7 @@ public class TelegramBotProperties {
     private String name;
     private String token;
     private int maxCachedParticipants = 512;
+    private int maxThreads = 8;
     private UserFlowState initialFlowState = UserFlowState.WELCOME;
     private AdminProperties admin;
 }

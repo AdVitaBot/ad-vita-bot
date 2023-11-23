@@ -1,5 +1,6 @@
 package com.github.sibmaks.ad_vita_bot.handler;
 
+import com.github.sibmaks.ad_vita_bot.bot.TelegramBotService;
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
 import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 public class ChooseThemeStateHandler implements StateHandler {
 
     private final ChatStorage chatStorage;
+    private final TelegramBotService telegramBotService;
     private final TelegramBotStorage telegramBotStorage;
     private final LocalisationService localisationService;
 
@@ -41,23 +43,14 @@ public class ChooseThemeStateHandler implements StateHandler {
     }
 
     @Override
-    public Transition onEnter(long chatId, DefaultAbsSender sender, Update update) {
+    public Transition onEnter(long chatId, Update update) {
         var command = buildEnterMessage(chatId);
-
-        try {
-            log.debug("[{}] Send chose theme message", chatId);
-            var rs = sender.execute(command);
-            log.debug("[{}] Rs was sent: {}", chatId, rs.getMessageId());
-        } catch (TelegramApiException e) {
-            log.error("Message sending error", e);
-            throw new SendRsException("Message sending error",e);
-        }
-
+        telegramBotService.sendSync(chatId, "chose theme message", command);
         return Transition.stop();
     }
 
     @Override
-    public Transition onInput(long chatId, DefaultAbsSender sender, Update update) {
+    public Transition onInput(long chatId, Update update) {
         if (!update.hasCallbackQuery()) {
             return Transition.stop();
         }
@@ -66,20 +59,13 @@ public class ChooseThemeStateHandler implements StateHandler {
         var theme = telegramBotStorage.findThemeById(themeId);
         if (theme != null) {
             chatStorage.setTheme(chatId, theme);
-            hideKeyboard(chatId, sender, callbackQuery, log);
+            hideKeyboard(chatId, telegramBotService, callbackQuery);
 
             return Transition.go(UserFlowState.CHOOSE_AMOUNT);
         } else {
             var command = buildErrorMessage(chatId);
 
-            try {
-                log.warn("[{}] Send unknown theme chosen", chatId);
-                var rs = sender.execute(command);
-                log.debug("[{}] Rs was sent: {}", chatId, rs.getMessageId());
-            } catch (TelegramApiException e) {
-                log.error("Message sending error", e);
-                throw new SendRsException("Message sending error",e);
-            }
+            telegramBotService.sendSync(chatId, "unknown theme", command);
 
             return Transition.stop();
         }

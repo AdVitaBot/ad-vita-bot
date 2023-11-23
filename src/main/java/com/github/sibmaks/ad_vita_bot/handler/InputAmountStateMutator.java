@@ -1,9 +1,9 @@
 package com.github.sibmaks.ad_vita_bot.handler;
 
+import com.github.sibmaks.ad_vita_bot.bot.TelegramBotService;
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
 import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
-import com.github.sibmaks.ad_vita_bot.exception.SendRsException;
 import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import lombok.RequiredArgsConstructor;
@@ -11,11 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardRemove;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.math.BigDecimal;
 import java.util.regex.Pattern;
@@ -31,6 +29,7 @@ public class InputAmountStateMutator implements StateHandler {
     private static final Pattern AMOUNT_PATTERN = Pattern.compile("^([0-9])+(.[0-9]{1,2})?$");
 
     private final ChatStorage chatStorage;
+    private final TelegramBotService telegramBotService;
     private final LocalisationService localisationService;
 
     @Override
@@ -39,22 +38,14 @@ public class InputAmountStateMutator implements StateHandler {
     }
 
     @Override
-    public Transition onEnter(long chatId, DefaultAbsSender sender, Update update) {
+    public Transition onEnter(long chatId, Update update) {
         var command = buildEnterMessage(chatId);
-
-        try {
-            log.info("[{}] Send input amount message", chatId);
-            sender.execute(command);
-        } catch (TelegramApiException e) {
-            log.error("Message sending error", e);
-            throw new SendRsException("Message sending error",e);
-        }
-
+        telegramBotService.sendSync(chatId, "input amount message", command);
         return Transition.stop();
     }
 
     @Override
-    public Transition onInput(long chatId, DefaultAbsSender sender, Update update) {
+    public Transition onInput(long chatId, Update update) {
         if (!update.hasMessage()) {
             return Transition.stop();
         }
@@ -69,15 +60,7 @@ public class InputAmountStateMutator implements StateHandler {
             return Transition.go(UserFlowState.INVOICE);
         } else {
             var command = buildErrorMessage(chatId);
-
-            try {
-                log.warn("[{}] Send incorrect amount message", chatId);
-                sender.execute(command);
-            } catch (TelegramApiException e) {
-                log.error("Message sending error", e);
-                throw new SendRsException("Message sending error",e);
-            }
-
+            telegramBotService.sendSync(chatId, "incorrect amount message", command);
             return Transition.stop();
         }
     }

@@ -2,6 +2,7 @@ package com.github.sibmaks.ad_vita_bot.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.sibmaks.ad_vita_bot.bot.TelegramBotService;
 import com.github.sibmaks.ad_vita_bot.constant.ServiceError;
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
@@ -9,7 +10,6 @@ import com.github.sibmaks.ad_vita_bot.dto.InvoicePayload;
 import com.github.sibmaks.ad_vita_bot.entity.Donation;
 import com.github.sibmaks.ad_vita_bot.entity.DonationStatus;
 import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
-import com.github.sibmaks.ad_vita_bot.exception.SendRsException;
 import com.github.sibmaks.ad_vita_bot.exception.ServiceException;
 import com.github.sibmaks.ad_vita_bot.repository.DrawingRepository;
 import com.github.sibmaks.ad_vita_bot.service.ChatStorage;
@@ -21,17 +21,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.AnswerPreCheckoutQuery;
 import org.telegram.telegrambots.meta.api.methods.invoices.SendInvoice;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.payments.LabeledPrice;
 import org.telegram.telegrambots.meta.api.objects.payments.OrderInfo;
 import org.telegram.telegrambots.meta.api.objects.payments.PreCheckoutQuery;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +45,7 @@ import static com.github.sibmaks.ad_vita_bot.constant.CommonConst.HUNDRED;
 public class InvoiceStateMutator implements StateHandler {
 
     private final ChatStorage chatStorage;
+    private final TelegramBotService telegramBotService;
     private final ObjectMapper objectMapper;
     private final TelegramBotStorage telegramBotStorage;
     private final LocalisationService localisationService;
@@ -60,7 +58,7 @@ public class InvoiceStateMutator implements StateHandler {
     }
 
     @Override
-    public Transition onEnter(long chatId, DefaultAbsSender sender, Update update) {
+    public Transition onEnter(long chatId, Update update) {
         var theme = chatStorage.getTheme(chatId);
         var drawing = drawingRepository.findLeastUsed(theme.getId(), chatId);
         if(drawing == null) {
@@ -70,20 +68,12 @@ public class InvoiceStateMutator implements StateHandler {
         var donation = donationService.createDonation(chatId, amount, drawing);
 
         var command = buildEnterMessage(chatId, donation);
-
-        try {
-            log.info("[{}] Send invoice", chatId);
-            sender.execute(command);
-        } catch (TelegramApiException e) {
-            log.error("Message sending error", e);
-            throw new SendRsException("Message sending error", e);
-        }
-
+        telegramBotService.sendSync(chatId, "invoice", command);
         return Transition.stop();
     }
 
     @Override
-    public Transition onInput(long chatId, DefaultAbsSender sender, Update update) {
+    public Transition onInput(long chatId, Update update) {
         if (!update.hasPreCheckoutQuery()) {
             return Transition.stop();
         }
@@ -93,13 +83,7 @@ public class InvoiceStateMutator implements StateHandler {
         var query = new AnswerPreCheckoutQuery();
         query.setOk(true);
         query.setPreCheckoutQueryId(preCheckoutQuery.getId());
-        try {
-            log.info("[{}] Send ok answer on pre checkout query", chatId);
-            sender.execute(query);
-        } catch (TelegramApiException e) {
-            log.error("Message sending error", e);
-            throw new SendRsException("Message sending error", e);
-        }
+        telegramBotService.sendSync(chatId, "pre check query", query);
         return Transition.go(UserFlowState.PAYMENT);
     }
 

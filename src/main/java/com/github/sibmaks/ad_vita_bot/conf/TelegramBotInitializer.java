@@ -1,6 +1,6 @@
 package com.github.sibmaks.ad_vita_bot.conf;
 
-import com.github.sibmaks.ad_vita_bot.bot.TelegramStateBot;
+import com.github.sibmaks.ad_vita_bot.bot.TelegramBotService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 @Configuration
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class TelegramBotInitializer {
-    private final TelegramStateBot telegramStateBot;
+    private final TelegramBotService telegramBotService;
     private final TelegramBotProperties telegramBotProperties;
 
     @EventListener(ContextRefreshedEvent.class)
@@ -29,7 +29,7 @@ public class TelegramBotInitializer {
         }
         var telegramBotsApi = new TelegramBotsApi(DefaultBotSession.class);
         try {
-            telegramBotsApi.registerBot(telegramStateBot);
+            telegramBotsApi.registerBot(telegramBotService);
         } catch (TelegramApiException e) {
             log.error("Bot initialization error", e);
         }

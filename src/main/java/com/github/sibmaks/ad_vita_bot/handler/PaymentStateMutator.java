@@ -2,6 +2,7 @@ package com.github.sibmaks.ad_vita_bot.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.sibmaks.ad_vita_bot.bot.TelegramBotService;
 import com.github.sibmaks.ad_vita_bot.constant.ServiceError;
 import com.github.sibmaks.ad_vita_bot.core.StateHandler;
 import com.github.sibmaks.ad_vita_bot.core.Transition;
@@ -9,7 +10,6 @@ import com.github.sibmaks.ad_vita_bot.dto.InvoicePayload;
 import com.github.sibmaks.ad_vita_bot.entity.Donation;
 import com.github.sibmaks.ad_vita_bot.entity.DonationStatus;
 import com.github.sibmaks.ad_vita_bot.entity.UserFlowState;
-import com.github.sibmaks.ad_vita_bot.exception.SendRsException;
 import com.github.sibmaks.ad_vita_bot.exception.ServiceException;
 import com.github.sibmaks.ad_vita_bot.service.DonationService;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
@@ -17,13 +17,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.bots.DefaultAbsSender;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.methods.send.SendPhoto;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.payments.SuccessfulPayment;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.ByteArrayInputStream;
 
@@ -36,6 +34,7 @@ import java.io.ByteArrayInputStream;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class PaymentStateMutator implements StateHandler {
 
+    private final TelegramBotService telegramBotService;
     private final ObjectMapper objectMapper;
     private final LocalisationService localisationService;
     private final DonationService donationService;
@@ -46,12 +45,12 @@ public class PaymentStateMutator implements StateHandler {
     }
 
     @Override
-    public Transition onEnter(long chatId, DefaultAbsSender sender, Update update) {
+    public Transition onEnter(long chatId, Update update) {
         return Transition.stop();
     }
 
     @Override
-    public Transition onInput(long chatId, DefaultAbsSender sender, Update update) {
+    public Transition onInput(long chatId, Update update) {
         if (!update.hasMessage()) {
             return Transition.stop();
         }
@@ -63,22 +62,10 @@ public class PaymentStateMutator implements StateHandler {
         var donation = updateDonation(successfulPayment);
 
         var themeMessage = buildThemeMessage(chatId, donation);
-        try {
-            log.info("[{}] Send theme message", chatId);
-            sender.execute(themeMessage);
-        } catch (TelegramApiException e) {
-            log.error("Message sending error", e);
-            throw new SendRsException("Message sending error", e);
-        }
+        telegramBotService.sendSync(chatId, "theme", themeMessage);
 
         var imageMessage = buildImageMessage(chatId, donation);
-        try {
-            log.info("[{}] Send image", chatId);
-            sender.execute(imageMessage);
-        } catch (TelegramApiException e) {
-            log.error("Message sending error", e);
-            throw new SendRsException("Message sending error", e);
-        }
+        telegramBotService.sendSync(chatId, "image", imageMessage);
 
         return Transition.go(UserFlowState.TRY_MORE);
 
