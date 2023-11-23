@@ -6,6 +6,10 @@ UPDATE "localization"
 SET "message"='Выберете сумму пожертвования или введите свою сумму, нажав на кнопку «Другая сумма»'
 WHERE "code" = 'choose_amount_text';
 
+UPDATE "localization"
+SET "message"='Мы вместе с Татьяной Задорожней вам желаем хорошего дня и благодарим за помощь подопечным фонда AdVita!'
+WHERE "code" = 'thankfully_message_text';
+
 UPDATE "theme"
 SET "description" = 'Печенька с предсказаниями'
 WHERE "id" = 1;
