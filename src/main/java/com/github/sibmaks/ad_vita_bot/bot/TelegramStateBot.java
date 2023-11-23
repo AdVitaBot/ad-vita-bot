@@ -46,8 +46,10 @@ public class TelegramStateBot extends TelegramLongPollingBot {
     public TelegramStateBot(DefaultBotOptions defaultBotOptions,
                             TelegramBotProperties telegramBotProperties,
                             ChatStorage chatStorage,
-                            TelegramBotStorage telegramBotStorage, ChatIdSupplier chatIdSupplier,
-                            LocalisationService localisationService, List<StateHandler> stateHandlers) {
+                            TelegramBotStorage telegramBotStorage,
+                            ChatIdSupplier chatIdSupplier,
+                            LocalisationService localisationService,
+                            List<StateHandler> stateHandlers) {
         super(defaultBotOptions, telegramBotProperties.getToken());
         this.botUsername = telegramBotProperties.getName();
         this.initialFlowState = telegramBotProperties.getInitialFlowState();
@@ -61,11 +63,11 @@ public class TelegramStateBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-            var chatId = chatIdSupplier.getChatId(update);
-            if (chatId == null) {
-                log.warn("Can't determine chatId for update {}", update.getUpdateId());
-                return;
-            }
+        var chatId = chatIdSupplier.getChatId(update);
+        if (chatId == null) {
+            log.warn("Can't determine chatId for update {}", update.getUpdateId());
+            return;
+        }
         try {
             if (preCheckDate(chatId)) {
                 return;
@@ -120,7 +122,7 @@ public class TelegramStateBot extends TelegramLongPollingBot {
             execute(command);
         } catch (TelegramApiException e) {
             log.error("Message sending error", e);
-            throw new SendRsException("Message sending error",e);
+            throw new SendRsException("Message sending error", e);
         }
         return true;
     }
@@ -152,9 +154,9 @@ public class TelegramStateBot extends TelegramLongPollingBot {
     /**
      * Proceed transition until stop
      *
-     * @param update incoming update
-     * @param chatId chat identifier
-     * @param state current flow state
+     * @param update     incoming update
+     * @param chatId     chat identifier
+     * @param state      current flow state
      * @param transition next transition
      * @return final flow state
      */
@@ -179,7 +181,7 @@ public class TelegramStateBot extends TelegramLongPollingBot {
      */
     private StateHandler getHandler(UserFlowState state) {
         var transitionHandler = transitionHandlers.get(state);
-        if(transitionHandler == null) {
+        if (transitionHandler == null) {
             throw new IllegalStateException("There are no handlers for state %s".formatted(state));
         }
         return transitionHandler;

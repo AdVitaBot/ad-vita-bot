@@ -139,6 +139,23 @@ public class InvoiceStateMutator implements StateHandler {
                 .needEmail(Boolean.TRUE)
                 .sendEmailToProvider(Boolean.TRUE)
                 .providerToken(invoiceProviderToken)
+                .replyMarkup(paymentKeyboard())
+                .build();
+    }
+
+    private InlineKeyboardMarkup paymentKeyboard() {
+        var payButton = localisationService.getLocalization("pay_button_text");
+        return InlineKeyboardMarkup.builder()
+                .keyboardRow(List.of(
+                        payKeyboardButton(payButton)
+                ))
+                .build();
+    }
+
+    public InlineKeyboardButton payKeyboardButton(String text) {
+        return InlineKeyboardButton.builder()
+                .text(text)
+                .pay(Boolean.TRUE)
                 .build();
     }
 
