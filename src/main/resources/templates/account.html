@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdVitaBot Admin Panel</title>
+    <link th:href="@{/libs/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/libs/fontawesome/css/all.min.css}" rel="stylesheet">
+    <link th:href="@{/css/app.css}" rel="stylesheet">
+    <script th:src="@{/libs/js/jquery.min.js}"></script>
+    <script th:src="@{/js/core.js}" lang="js"></script>
+</head>
+<body>
+<div class="button-navbar">
+    <button class="btn-sm btn-primary rounded-circle" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+</div>
+<div class="container-fluid vh-100">
+    <div class="mt-5">
+        <div class="rounded d-flex justify-content-center">
+            <form id="account-form" class="col-md-4 col-sm-12 shadow-lg p-5 bg-light" onsubmit="return false;">
+                <a style="float: left" class="btn btn-outline-secondary" th:href="@{/menu}">&lt;</a>
+                <div class="text-center" style="margin-bottom: 16px">
+                    <h3 class="text-primary">Управление аккаунтом</h3>
+                </div>
+                <div id="success-info" class="d-none alert alert-success" role="alert">
+                    Сохранено успешно
+                </div>
+                <div id="error-info" class="d-none alert alert-danger" role="alert">
+                    Ошибка сохранения
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="old-password">Старый пароль</label>
+                    <input class="form-control" id="old-password" type="password" required/>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="new-password">Новый пароль</label>
+                    <input class="form-control" id="new-password" type="password" required/>
+                    <div id="validation-new-password" class="invalid-feedback d-none"></div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="repeat-new-password">Повторение нового пароля</label>
+                    <input class="form-control" id="repeat-new-password" type="password" required/>
+                    <div id="validation-repeat-new-password" class="invalid-feedback d-none"></div>
+                </div>
+                <div class="mb-3">
+                    <button id="save-btn" class="float-end btn btn-primary" type="button" onclick="updatePassword()">Сохранить</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script th:src="@{/js/account.js}"></script>
+</div>
+</body>
+</html>

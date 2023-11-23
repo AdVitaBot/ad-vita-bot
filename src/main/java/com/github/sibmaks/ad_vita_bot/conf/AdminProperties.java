@@ -14,8 +14,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AdminProperties {
-    private String username;
-    private String password;
     private DrawingProps drawing;
 
     @Getter

@@ -2,7 +2,6 @@ package com.github.sibmaks.ad_vita_bot.controller;
 
 import com.github.sibmaks.ad_vita_bot.conf.AdminProperties;
 import com.github.sibmaks.ad_vita_bot.conf.TelegramBotProperties;
-import com.github.sibmaks.ad_vita_bot.constant.CommonConst;
 import com.github.sibmaks.ad_vita_bot.entity.Drawing;
 import com.github.sibmaks.ad_vita_bot.service.LocalisationService;
 import com.github.sibmaks.ad_vita_bot.service.SessionService;
@@ -49,17 +48,15 @@ public class UIController {
      */
     @GetMapping("/")
     public String index(HttpServletRequest request) {
-        var sessionId = getSessionId(request);
-        if(sessionId != null) {
-            return "redirect:/menu";
+        if (isNotAuthorized(request)) {
+            return "index";
         }
-        return "index";
+        return "redirect:/menu";
     }
 
     @GetMapping("/menu")
     public String getMenu(HttpServletRequest request) {
-        var sessionId = getSessionId(request);
-        if(sessionId == null) {
+        if(isNotAuthorized(request)) {
             return "redirect:/";
         }
         return "menu";
@@ -67,8 +64,7 @@ public class UIController {
 
     @GetMapping("/localizations")
     public String getLocalizations(HttpServletRequest request, Model model) {
-        var sessionId = getSessionId(request);
-        if(sessionId == null) {
+        if(isNotAuthorized(request)) {
             return "redirect:/";
         }
         var localizations = localisationService.getLocalizations();
@@ -78,8 +74,7 @@ public class UIController {
 
     @GetMapping("/themes")
     public String getThemes(HttpServletRequest request, Model model) {
-        var sessionId = getSessionId(request);
-        if(sessionId == null) {
+        if(isNotAuthorized(request)) {
             return "redirect:/";
         }
         var themes = telegramBotStorage.getThemes();
@@ -89,8 +84,7 @@ public class UIController {
 
     @GetMapping("/theme/edit/{themeId}")
     public String editTheme(HttpServletRequest request, Model model, @PathVariable(name = "themeId") String themeId) {
-        var sessionId = getSessionId(request);
-        if(sessionId == null) {
+        if(isNotAuthorized(request)) {
             return "redirect:/";
         }
         var theme = telegramBotStorage.findThemeById(Long.parseLong(themeId));
@@ -100,8 +94,7 @@ public class UIController {
 
     @GetMapping("/theme/drawings/{themeId}")
     public String editDrawings(HttpServletRequest request, Model model, @PathVariable(name = "themeId") String themeId) {
-        var sessionId = getSessionId(request);
-        if(sessionId == null) {
+        if(isNotAuthorized(request)) {
             return "redirect:/";
         }
         var theme = telegramBotStorage.findThemeById(Long.parseLong(themeId));
@@ -115,8 +108,7 @@ public class UIController {
 
     @GetMapping("/theme/drawings/{themeId}/add")
     public String addDrawings(HttpServletRequest request, Model model, @PathVariable(name = "themeId") String themeId) {
-        var sessionId = getSessionId(request);
-        if(sessionId == null) {
+        if(isNotAuthorized(request)) {
             return "redirect:/";
         }
         model.addAttribute("themeId", themeId);
@@ -126,8 +118,7 @@ public class UIController {
 
     @GetMapping("/bot_props")
     public String getRooms(HttpServletRequest request, Model model) {
-        var sessionId = getSessionId(request);
-        if(sessionId == null) {
+        if(isNotAuthorized(request)) {
             return "redirect:/";
         }
         var deactivationDate = telegramBotStorage.getDeactivationDate();
@@ -137,28 +128,19 @@ public class UIController {
         return "bot_properties";
     }
 
-    /**
-     * Get session identifier from http request.
-     * Looking for session id in headers and cookies
-     *
-     * @param request http servlet request
-     * @return session identifier
-     */
-    private String getSessionId(HttpServletRequest request) {
-        var header = request.getHeader(CommonConst.HEADER_SESSION_ID);
-        if(header == null && request.getCookies() != null) {
-            for (var cookie : request.getCookies()) {
-                if(CommonConst.HEADER_SESSION_ID.equals(cookie.getName())) {
-                    header = cookie.getValue();
-                    break;
-                }
-            }
+    @GetMapping("/account")
+    public String account(HttpServletRequest request) {
+        if(isNotAuthorized(request)) {
+            return "redirect:/";
         }
-        if(header != null) {
-            if(sessionService.isActive(header)) {
-                return header;
-            }
+        return "account";
+    }
+
+    private boolean isNotAuthorized(HttpServletRequest request) {
+        var session = sessionService.getSession(request);
+        if(session == null) {
+            return true;
         }
-        return null;
+        return !session.isAuthorized();
     }
 }

@@ -44,7 +44,7 @@ public class AuthorizationService {
         if(header == null) {
             throw new UnauthorizedException("Session header/cookie not presented");
         }
-        if(!sessionService.isActive(header)) {
+        if(!sessionService.isAuthorized(header)) {
             throw new UnauthorizedException("Session not active");
         }
         return pjp.proceed(pjp.getArgs());

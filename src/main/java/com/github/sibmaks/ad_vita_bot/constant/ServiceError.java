@@ -9,5 +9,6 @@ public enum ServiceError {
     UNEXPECTED_ERROR,
     TO_BIG,
     UNSUPPORTED_TYPE,
-    UNAUTHORIZED
+    UNAUTHORIZED,
+    VALIDATION_ERROR
 }

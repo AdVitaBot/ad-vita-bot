@@ -53,7 +53,7 @@ public class DrawingServiceImpl implements DrawingService {
         var drawingContent = decoder.decode(content);
         var maxFileSize = drawingProps.getMaxFileSize();
         if(drawingContent.length >= maxFileSize) {
-            throw new ServiceException("Файл слишком большой: %d КБ".formatted(drawingContent.length / 1024 + 1), ServiceError.UNSUPPORTED_TYPE);
+            throw new ServiceException("Файл слишком большой: %d КБ".formatted(drawingContent.length / 1024 + 1), ServiceError.TO_BIG);
         }
         var mimeType = tika.detect(drawingContent);
         if(isNotSupported(mimeType)) {
